@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Make Listing -->
+    <virtualType name="ETechFlow\ProductFitmentFinder\Make\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">etechflow_vehicle_make</argument>
+            <argument name="resourceModel" xsi:type="string">ETechFlow\ProductFitmentFinder\Model\ResourceModel\Make\Collection</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Model Listing -->
+    <virtualType name="ETechFlow\ProductFitmentFinder\Model\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">etechflow_vehicle_model</argument>
+            <argument name="resourceModel" xsi:type="string">ETechFlow\ProductFitmentFinder\Model\ResourceModel\Model\Collection</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="etechflow_vehicle_make_listing_data_source"  xsi:type="string">ETechFlow\ProductFitmentFinder\Make\Grid\Collection</item>
+                <item name="etechflow_vehicle_model_listing_data_source" xsi:type="string">ETechFlow\ProductFitmentFinder\Model\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Product save: enrich make_name/model_name onto structured array -->
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="etechflow_vehicle_compat_save_enrich"
+                type="ETechFlow\ProductFitmentFinder\Plugin\ProductActionPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <!-- Replace category Layer collection when URL has vehicle params -->
+    <type name="Magento\Catalog\Model\Layer\Category">
+        <plugin name="etechflow_vehicle_compat_layer_filter"
+                type="ETechFlow\ProductFitmentFinder\Plugin\Catalog\Layer\FilterByVehicle"
+                sortOrder="100"/>
+    </type>
+    <type name="Magento\Catalog\Model\Layer">
+        <plugin name="etechflow_vehicle_compat_layer_filter"
+                type="ETechFlow\ProductFitmentFinder\Plugin\Catalog\Layer\FilterByVehicle"
+                sortOrder="100"/>
+    </type>
+
+    <!-- Suppress layered nav (SHOP BY) blocks when vehicle params present -->
+    <type name="Magento\LayeredNavigation\Block\Navigation">
+        <plugin name="etechflow_vehicle_compat_hide_leftnav"
+                type="ETechFlow\ProductFitmentFinder\Plugin\Catalog\Block\HideLayeredNav"
+                sortOrder="100"/>
+    </type>
+
+    <!-- CLI command -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="etechflow_vehicle_compat_import_parts" xsi:type="object">ETechFlow\ProductFitmentFinder\Console\Command\ImportPartsCsv</item>
+                <item name="etechflow_vehicle_compat_migrate" xsi:type="object">ETechFlow\ProductFitmentFinder\Console\Command\MigrateLegacyHtml</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

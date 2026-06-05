@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <etechflow_vehiclecompat>
+            <license>
+                <license_key></license_key>
+                <production_environment>1</production_environment>
+            </license>
+            <general>
+                <enabled>1</enabled>
+                <earliest_year>1990</earliest_year>
+                <show_year_field>1</show_year_field>
+                <label_make>Make</label_make>
+                <label_model>Model</label_model>
+                <label_year>Year</label_year>
+                <label_part>Parts Required</label_part>
+            </general>
+            <pdp_badge>
+                <enabled>0</enabled>
+                <prefix>Fits:</prefix>
+                <style>success</style>
+            </pdp_badge>
+            <seo_urls>
+                <enabled>0</enabled>
+                <prefix>parts</prefix>
+            </seo_urls>
+            <garage>
+                <enabled>0</enabled>
+                <max_entries>3</max_entries>
+            </garage>
+            <copy>
+                <find_button_text>Find Parts</find_button_text>
+                <find_page_title>Find Your Parts</find_page_title>
+                <empty_state_message>Pick a {make}, {model}, {year} or {part} to see matching products.</empty_state_message>
+                <save_button_text>Save Selection</save_button_text>
+                <garage_empty_prompt>Save a selection here for one-click reload later.</garage_empty_prompt>
+            </copy>
+            <oem>
+                <enabled>0</enabled>
+                <attribute_codes>sku</attribute_codes>
+                <search_label>Or search by part number</search_label>
+                <search_placeholder>Type part number…</search_placeholder>
+            </oem>
+            <polish>
+                <no_results_title>No products match all your filters.</no_results_title>
+                <no_results_hint>Try removing one or two filters — fewer constraints usually find a match.</no_results_hint>
+                <use_form_prompt>Use the form above to start.</use_form_prompt>
+                <no_matches>No matches</no_matches>
+                <dropdown_search_placeholder>Search…</dropdown_search_placeholder>
+                <fitment_overflow_template>and {count} more</fitment_overflow_template>
+                <garage_title>My Garage</garage_title>
+                <garage_clear>Clear Garage</garage_clear>
+                <garage_remove>Remove</garage_remove>
+                <saved_feedback>Saved!</saved_feedback>
+                <sidebar_no_filters>No filters active.</sidebar_no_filters>
+                <oem_button>Search</oem_button>
+                <accent_colour>#0535F5</accent_colour>
+            </polish>
+        </etechflow_vehiclecompat>
+    </default>
+</config>

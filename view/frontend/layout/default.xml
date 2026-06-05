@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+  Loads two JS files on every storefront page:
+
+  1. alpine-bootstrap.js  — no-op on Hyva (Alpine already loaded);
+                            on Luma / custom themes it lazy-loads Alpine
+                            from a CDN so the Part Finder widget works
+                            without a theme-level dependency.
+
+  2. part-finder.js   — the Alpine factory function used by the
+                            Part Finder form fragment. Defined on window
+                            so any x-data="vehicleCompatPartFinder(...)" on the page
+                            can call it.
+
+  Stores can override either file by shipping a same-named file at a
+  higher precedence path (your theme's web/js/ directory) — Magento's
+  standard fallback applies.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="ETechFlow_ProductFitmentFinder::js/alpine-bootstrap.js"/>
+        <script src="ETechFlow_ProductFitmentFinder::js/part-finder.js"/>
+    </head>
+</page>

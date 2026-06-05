@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Register the VehicleCompat modifier in BOTH product modifier pools so the
+         fieldset appears on edit AND new product forms. -->
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="etechflow_vehicle_compat" xsi:type="array">
+                    <item name="class" xsi:type="string">ETechFlow\ProductFitmentFinder\Ui\DataProvider\Product\Form\Modifier\VehicleCompat</item>
+                    <item name="sortOrder" xsi:type="number">200</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\NewProduct\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="etechflow_vehicle_compat" xsi:type="array">
+                    <item name="class" xsi:type="string">ETechFlow\ProductFitmentFinder\Ui\DataProvider\Product\Form\Modifier\VehicleCompat</item>
+                    <item name="sortOrder" xsi:type="number">200</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+</config>

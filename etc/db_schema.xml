@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <table name="etechflow_vehicle_make" resource="default" engine="innodb" comment="Vehicle makes for compatibility editor">
+        <column xsi:type="int"       name="make_id"    unsigned="true" nullable="false" identity="true" comment="Make ID"/>
+        <column xsi:type="varchar"   name="name"       length="64"     nullable="false" comment="Make name"/>
+        <column xsi:type="smallint"  name="sort_order" unsigned="true" nullable="false" default="0" comment="Sort order"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="make_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ETECHFLOW_VEHICLE_MAKE_NAME">
+            <column name="name"/>
+        </constraint>
+        <index referenceId="ETECHFLOW_VEHICLE_MAKE_SORT" indexType="btree">
+            <column name="sort_order"/>
+        </index>
+    </table>
+
+    <table name="etechflow_vehicle_model" resource="default" engine="innodb" comment="Vehicle models per make">
+        <column xsi:type="int"       name="model_id"   unsigned="true" nullable="false" identity="true" comment="Model ID"/>
+        <column xsi:type="int"       name="make_id"    unsigned="true" nullable="false" comment="Make ID"/>
+        <column xsi:type="varchar"   name="name"       length="64"     nullable="false" comment="Model name"/>
+        <column xsi:type="smallint"  name="sort_order" unsigned="true" nullable="false" default="0" comment="Sort order"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="model_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="ETECHFLOW_VEHICLE_MODEL_MAKE_ID_FK"
+                    table="etechflow_vehicle_model" column="make_id"
+                    referenceTable="etechflow_vehicle_make" referenceColumn="make_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="ETECHFLOW_VEHICLE_MODEL_MAKE_NAME">
+            <column name="make_id"/>
+            <column name="name"/>
+        </constraint>
+        <index referenceId="ETECHFLOW_VEHICLE_MODEL_MAKE_ID" indexType="btree">
+            <column name="make_id"/>
+        </index>
+    </table>
+</schema>

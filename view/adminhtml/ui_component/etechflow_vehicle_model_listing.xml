@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">etechflow_vehicle_model_listing.etechflow_vehicle_model_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>etechflow_vehicle_model_columns</spinner>
+        <deps>
+            <dep>etechflow_vehicle_model_listing.etechflow_vehicle_model_listing_data_source</dep>
+        </deps>
+        <buttons>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add New Model</label>
+            </button>
+        </buttons>
+    </settings>
+
+    <dataSource name="etechflow_vehicle_model_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">model_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>ETechFlow_ProductFitmentFinder::model</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+                      name="etechflow_vehicle_model_listing_data_source">
+            <settings>
+                <requestFieldName>model_id</requestFieldName>
+                <primaryFieldName>model_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <listingToolbar name="listing_top">
+        <settings><sticky>true</sticky></settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+
+    <columns name="etechflow_vehicle_model_columns">
+        <selectionsColumn name="ids">
+            <settings><indexField>model_id</indexField></settings>
+        </selectionsColumn>
+        <column name="model_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+        <column name="make_name" class="ETechFlow\ProductFitmentFinder\Ui\Component\Listing\Column\MakeName">
+            <settings>
+                <label translate="true">Make</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Model</label>
+            </settings>
+        </column>
+        <column name="sort_order">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Sort Order</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="ETechFlow\ProductFitmentFinder\Ui\Component\Listing\Column\ModelActions">
+            <settings>
+                <indexField>model_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>100</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

@@ -1,0 +1,578 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="etechflow" translate="label" sortOrder="400">
+            <label>eTechFlow</label>
+        </tab>
+        <section id="etechflow_vehiclecompat"
+                 translate="label"
+                 type="text"
+                 sortOrder="180"
+                 showInDefault="1"
+                 showInWebsite="1"
+                 showInStore="1">
+            <label>Vehicle Compatibility</label>
+            <tab>etechflow</tab>
+            <resource>ETechFlow_ProductFitmentFinder::config</resource>
+
+            <group id="license"
+                   translate="label"
+                   type="text"
+                   sortOrder="5"
+                   showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>License</label>
+                <field id="production_environment"
+                       translate="label comment tooltip"
+                       type="select"
+                       sortOrder="5"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Production Environment</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Yes for live sites, No for dev/staging on non-standard domains.</tooltip>
+                    <comment><![CDATA[
+                        <strong>Yes</strong> = this is your live site. The module checks the licence
+                        key against the current domain. If invalid, the module silently disables itself.<br/>
+                        <strong>No</strong> = this is dev/staging. The module runs at full features
+                        without a licence — use this on non-standard dev domains the auto-detector misses.<br/>
+                        Default: Yes.
+                    ]]></comment>
+                </field>
+                <field id="license_key"
+                       translate="label comment tooltip"
+                       type="text"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>License Key</label>
+                    <tooltip>Paste your purchase-email key here. Bound to the production domain.</tooltip>
+                    <comment><![CDATA[
+                        Paste the key from your purchase email. Tied to your live website's address.<br/>
+                        Test or staging sites don't need a key — the module detects them automatically.<br/>
+                        <code>www.</code> doesn't matter — one key works whether your address is
+                        <code>shop.com</code> or <code>www.shop.com</code>.
+                    ]]></comment>
+                </field>
+            </group>
+
+            <group id="general"
+                   translate="label"
+                   type="text"
+                   sortOrder="10"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>General Settings</label>
+                <field id="enabled"
+                       translate="label comment tooltip"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Enable Module</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Master on/off. When No, the Part Finder widget and vehicle filters do not render.</tooltip>
+                    <comment><![CDATA[
+                        Master on/off switch.<br/>
+                        <strong>Yes</strong> = the Part Finder widget renders and vehicle filters apply
+                        to catalog browsing.<br/>
+                        <strong>No</strong> = the module does nothing on the storefront — useful for
+                        quickly disabling without uninstalling.
+                    ]]></comment>
+                </field>
+                <field id="earliest_year"
+                       translate="label comment tooltip"
+                       type="text"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Earliest Year</label>
+                    <validate>validate-number validate-greater-than-zero</validate>
+                    <tooltip>The oldest year that appears in the Year dropdown. Default 1990.</tooltip>
+                    <comment><![CDATA[
+                        The oldest year that appears in the Year dropdown on the Part Finder.<br/>
+                        <strong>Default 1990</strong> covers modern cars.<br/>
+                        <strong>Set to 1950</strong> for vintage car parts shops (classic Mustangs,
+                        Land Rover Series, etc.).<br/>
+                        <strong>Set to 2007</strong> for smartphone-fitment shops where there's no
+                        point listing pre-iPhone years.<br/>
+                        Anything below 1900 or above the current year is clamped to safe bounds.
+                    ]]></comment>
+                </field>
+                <field id="show_year_field"
+                       translate="label comment tooltip"
+                       type="select"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Show Year Field</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Hide the Year dropdown if your fitment domain doesn't need it (phone cases, watches, etc.).</tooltip>
+                    <comment><![CDATA[
+                        Show or hide the Year dropdown in the Part Finder form.<br/>
+                        <strong>Yes</strong> (default) = Year dropdown renders — for any time-bound
+                        fitment (vehicles, electronics with model years, etc.).<br/>
+                        <strong>No</strong> = Year dropdown is hidden — the form becomes Make → Model →
+                        Part. Useful for phone cases, watch straps, printer cartridges, appliance parts
+                        and similar domains where year doesn't matter.
+                    ]]></comment>
+                </field>
+                <field id="label_make"
+                       translate="label comment tooltip"
+                       type="text"
+                       sortOrder="40"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>"Make" Field Label</label>
+                    <tooltip>Customer-facing label for the Make dropdown. Leave blank for the default ("Make").</tooltip>
+                    <comment><![CDATA[
+                        Customer-facing label for the Make dropdown (top of the Part Finder).<br/>
+                        Default: <em>Make</em>. Common alternatives:<br/>
+                        - <strong>Brand</strong> — for phone cases, watches, appliances<br/>
+                        - <strong>Manufacturer</strong> — for industrial parts<br/>
+                        - <strong>Category</strong> — for cross-product fitment<br/>
+                        Leave blank to use the default.
+                    ]]></comment>
+                </field>
+                <field id="label_model"
+                       translate="label comment tooltip"
+                       type="text"
+                       sortOrder="50"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>"Model" Field Label</label>
+                    <tooltip>Customer-facing label for the Model dropdown.</tooltip>
+                    <comment><![CDATA[
+                        Default: <em>Model</em>. Common alternatives:<br/>
+                        - <strong>Phone</strong> / <strong>Tablet</strong> — for accessories<br/>
+                        - <strong>Watch</strong> — for watch parts<br/>
+                        - <strong>Model Number</strong> — for industrial parts
+                    ]]></comment>
+                </field>
+                <field id="label_year"
+                       translate="label comment tooltip"
+                       type="text"
+                       sortOrder="60"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>"Year" Field Label</label>
+                    <tooltip>Customer-facing label for the Year dropdown.</tooltip>
+                    <comment><![CDATA[
+                        Default: <em>Year</em>. Common alternatives:<br/>
+                        - <strong>Generation</strong> — for phones (iPhone 13/14/15…)<br/>
+                        - <strong>Year of Manufacture</strong> — for older fitments<br/>
+                        - <strong>Model Year</strong> — for cars where it matters
+                    ]]></comment>
+                </field>
+                <field id="label_part"
+                       translate="label comment tooltip"
+                       type="text"
+                       sortOrder="70"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>"Parts" Field Label</label>
+                    <tooltip>Customer-facing label for the Parts Required dropdown.</tooltip>
+                    <comment><![CDATA[
+                        Default: <em>Parts Required</em>. Common alternatives:<br/>
+                        - <strong>Type</strong> / <strong>Style</strong> — for phone cases<br/>
+                        - <strong>Strap Size</strong> — for watch straps<br/>
+                        - <strong>Component</strong> — for industrial parts
+                    ]]></comment>
+                </field>
+            </group>
+
+            <group id="pdp_badge" translate="label" type="text" sortOrder="20"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>PDP Fitment Badge (v1.1.0)</label>
+                <field id="enabled" translate="label comment tooltip" type="select"
+                       sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Fitment Badge on Product Page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Yes = render a "Fits: BMW 3 Series 2018-2023" badge under the price on every PDP that has fitment data.</tooltip>
+                    <comment><![CDATA[
+                        Renders a coloured "Fits: …" block right under the product price on
+                        the PDP for any product tagged with vehicle compatibility data.<br/><br/>
+                        <strong>Yes</strong> = badge renders when product has fitment data.<br/>
+                        <strong>No</strong> (default) = no badge. Existing v1.0.x installs see
+                        no change unless they opt in.
+                    ]]></comment>
+                </field>
+                <field id="prefix" translate="label comment tooltip" type="text"
+                       sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Badge Prefix Text</label>
+                    <tooltip>Bold label before the list of compatible vehicles. Default "Fits:".</tooltip>
+                    <comment><![CDATA[
+                        Bold text shown before the vehicle list. Default <em>Fits:</em>. Alternatives:<br/>
+                        - "Compatible with:" — formal<br/>
+                        - "Made for:" — friendly<br/>
+                        - "Bilingual stores": translate via Magento i18n.
+                    ]]></comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="style" translate="label comment tooltip" type="select"
+                       sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Badge Style</label>
+                    <source_model>ETechFlow\ProductFitmentFinder\Model\Source\BadgeStyle</source_model>
+                    <tooltip>Visual treatment: success (green), info (blue), warning (amber), neutral (grey).</tooltip>
+                    <comment><![CDATA[
+                        <strong>Success</strong> (green) — default, reads as a positive "yes this fits"<br/>
+                        <strong>Info</strong> (blue) — neutral informational tone<br/>
+                        <strong>Warning</strong> (amber) — attention-grabbing<br/>
+                        <strong>Neutral</strong> (grey) — minimal
+                    ]]></comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+            </group>
+
+            <group id="seo_urls" translate="label" type="text" sortOrder="30"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>SEO-Friendly URLs (v1.1.0)</label>
+                <field id="enabled" translate="label comment tooltip" type="select"
+                       sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable SEO URLs</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Yes = also accept /parts/bmw/3-series/2020/brake-pads style URLs.</tooltip>
+                    <comment><![CDATA[
+                        Adds a custom router that maps SEO-friendly paths to the Part Finder:<br/>
+                        <code>/parts/bmw/3-series/2020/brake-pads</code><br/>
+                        instead of the default<br/>
+                        <code>/vehiclecompat/find/index?make=42&amp;model=87&amp;year=2020&amp;part=12</code><br/><br/>
+                        Better SEO. Better social-share previews. Better crawlability.<br/><br/>
+                        <strong>Yes</strong> = both old and new URLs work — old links don't break.<br/>
+                        <strong>No</strong> (default) = only the query-string URLs work. Existing
+                        v1.0.x installs see no change unless they opt in.
+                    ]]></comment>
+                </field>
+                <field id="prefix" translate="label comment tooltip" type="text"
+                       sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>URL Prefix</label>
+                    <tooltip>The first segment of the SEO URL. Default "parts". Use "fitment", "compat", "for", etc.</tooltip>
+                    <comment><![CDATA[
+                        The first segment after the domain. Default: <code>parts</code> →
+                        <code>/parts/bmw/3-series/…</code><br/>
+                        Common alternatives:<br/>
+                        - <code>fitment</code> → <code>/fitment/bmw/…</code><br/>
+                        - <code>for</code> → <code>/for/bmw/…</code> (very short, reads naturally)<br/>
+                        - <code>compatibility</code> → longer but explicit<br/><br/>
+                        Sanitised to lowercase a–z, 0–9, and dashes. Anything else is stripped.
+                        Invalid values fall back to <code>parts</code>.
+                    ]]></comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+            </group>
+
+            <group id="copy" translate="label" type="text" sortOrder="15"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Customer-Facing Copy (v1.1.1)</label>
+                <comment><![CDATA[
+                    Override the customer-facing button text, page title, and empty-state
+                    messages. Pairs with the v1.0.2 label config so the entire Part Finder
+                    UX can be rebranded for non-vehicle domains (phone cases, watches,
+                    appliance parts, etc.). Leave blank to fall back to defaults.
+                ]]></comment>
+                <field id="find_button_text" translate="label comment tooltip" type="text"
+                       sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Find Button Text</label>
+                    <tooltip>Text on the big call-to-action button. Default "Find Parts".</tooltip>
+                    <comment><![CDATA[
+                        Text on the big call-to-action button at the bottom of the Part
+                        Finder form. Default: <em>Find Parts</em>. Alternatives:<br/>
+                        - <code>Find Cases</code> — phone case shops<br/>
+                        - <code>Find Watches</code> — watch shops<br/>
+                        - <code>Find Filters</code> — automotive filter shops<br/>
+                        - <code>Search</code> — minimalist<br/>
+                        Mixed-case recommended — v1.1.0 shipped all-caps "FIND PARTS" which read shouty.
+                    ]]></comment>
+                </field>
+                <field id="find_page_title" translate="label comment tooltip" type="text"
+                       sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Find Page Title</label>
+                    <tooltip>H1 heading on the search results page. Default "Find Your Parts".</tooltip>
+                    <comment><![CDATA[
+                        H1 heading on the search results page. Default: <em>Find Your Parts</em>.
+                        Phone-case shop: <code>Find Your Case</code>. Watch shop:
+                        <code>Find Your Strap</code>. Industrial: <code>Component Finder</code>.
+                    ]]></comment>
+                </field>
+                <field id="empty_state_message" translate="label comment tooltip" type="text"
+                       sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Empty State Message</label>
+                    <tooltip>Message shown when no filters are active. Supports {make} {model} {year} {part} placeholders that expand to your configured labels.</tooltip>
+                    <comment><![CDATA[
+                        Message shown when the customer lands on the Find page without
+                        any filters active. Supports four placeholders that automatically
+                        expand to your configured field labels (set in the General Settings
+                        group above):<br/>
+                        <code>{make}</code> · <code>{model}</code> · <code>{year}</code> · <code>{part}</code><br/><br/>
+                        Default: <em>Pick a {make}, {model}, {year} or {part} to see
+                        matching products.</em><br/>
+                        If you rename Make → Brand and Model → Phone, the empty state
+                        automatically reads <em>Pick a Brand, Phone, Year or Part to see
+                        matching products.</em> — no separate edit needed unless you
+                        want different wording.
+                    ]]></comment>
+                </field>
+                <field id="save_button_text" translate="label comment tooltip" type="text"
+                       sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Save Selection Button Text</label>
+                    <tooltip>Text on the "save to garage" button next to Find. Default "Save Selection".</tooltip>
+                    <comment><![CDATA[
+                        Text on the save-to-garage button next to Find. Default: <em>Save
+                        Selection</em>. Renders only when the Customer Garage is enabled
+                        (below) and the customer has picked at least a Make.
+                    ]]></comment>
+                </field>
+                <field id="garage_empty_prompt" translate="label comment tooltip" type="text"
+                       sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Garage Empty-State Prompt</label>
+                    <tooltip>Friendly nudge shown in the My Garage widget when no vehicles are saved.</tooltip>
+                    <comment><![CDATA[
+                        Friendly prompt shown in the My Garage widget when the customer
+                        hasn't saved anything yet. Default: <em>Save a selection here
+                        for one-click reload later.</em><br/>
+                        Without this prompt the widget would render nothing on empty state,
+                        and customers would never discover the feature.
+                    ]]></comment>
+                </field>
+            </group>
+
+            <group id="oem" translate="label" type="text" sortOrder="35"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>OEM / Part-Number Search (v1.2.0)</label>
+                <comment><![CDATA[
+                    Adds a "Or search by part number" input on the Find page so
+                    customers can paste an OEM / MPN number and find matching products
+                    directly (in addition to the Make/Model/Year/Part cascade).
+                ]]></comment>
+                <field id="enabled" translate="label comment tooltip" type="select"
+                       sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable OEM Search</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Yes = customers can paste a part number into a search box on the Find page.</tooltip>
+                    <comment><![CDATA[
+                        <strong>Yes</strong> = an "Or search by part number" input renders on the
+                        Find page. Customer pastes an OEM/MPN code, the catalog filters to products
+                        whose configured attribute(s) LIKE-match the term.<br/>
+                        <strong>No</strong> (default) = no input renders. The `?oem=...` query
+                        param is also ignored.
+                    ]]></comment>
+                </field>
+                <field id="attribute_codes" translate="label comment tooltip" type="text"
+                       sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attribute Codes to Search</label>
+                    <tooltip>Comma-separated product attribute codes. Default "sku".</tooltip>
+                    <comment><![CDATA[
+                        Which product attributes the OEM search filters against. Comma-separated
+                        attribute codes — accepts a–z, 0–9, underscore only.<br/>
+                        Default: <code>sku</code><br/>
+                        Common alternatives if you have custom attributes:<br/>
+                        - <code>sku, mpn</code><br/>
+                        - <code>sku, manufacturer_part_number, custom_oem</code><br/>
+                        Each code becomes an OR clause; the customer's term matches if it appears
+                        in ANY of the configured attributes.
+                    ]]></comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="search_label" translate="label comment tooltip" type="text"
+                       sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Box Label</label>
+                    <tooltip>Customer-facing label above the search box. Default "Or search by part number".</tooltip>
+                    <comment><![CDATA[
+                        Label rendered above the OEM search input. Default:
+                        <em>Or search by part number</em>.<br/>
+                        Phone-case shops: "Or search by model number".<br/>
+                        Watch shops: "Or search by reference number".
+                    ]]></comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="search_placeholder" translate="label comment tooltip" type="text"
+                       sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Box Placeholder</label>
+                    <tooltip>Placeholder text inside the input field. Default "Type part number…".</tooltip>
+                </field>
+            </group>
+
+            <group id="polish" translate="label" type="text" sortOrder="38"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Storefront Copy Polish + Tooltips (v1.2.1)</label>
+                <comment><![CDATA[
+                    Override the remaining customer-visible strings that v1.1.1 didn't
+                    expose — empty states, dropdown placeholders, garage actions, no-results
+                    messaging. Plus three customer-facing tooltips (rendered as title="")
+                    that give shoppers a hover hint on key UI elements. And a single
+                    accent colour override so the module's filter chips + buttons match
+                    your brand.
+                ]]></comment>
+                <field id="no_results_title" translate="label comment" type="text"
+                       sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>"No Results" Title</label>
+                    <comment>Shown when filters return zero products. Default: "No products match all your filters."</comment>
+                </field>
+                <field id="no_results_hint" translate="label comment" type="text"
+                       sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>"No Results" Hint</label>
+                    <comment>Secondary line under the no-results title. Default: "Try removing one or two filters — fewer constraints usually find a match."</comment>
+                </field>
+                <field id="use_form_prompt" translate="label comment" type="text"
+                       sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>"Use the Form" Prompt</label>
+                    <comment>Secondary line in the empty-state. Default: "Use the form above to start."</comment>
+                </field>
+                <field id="no_matches" translate="label comment" type="text"
+                       sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Dropdown "No Matches"</label>
+                    <comment>Shown when a typed search yields no items in a dropdown. Default: "No matches"</comment>
+                </field>
+                <field id="dropdown_search_placeholder" translate="label comment" type="text"
+                       sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Dropdown Search Placeholder</label>
+                    <comment>Placeholder in each dropdown's search input. Default: "Search…"</comment>
+                </field>
+                <field id="fitment_overflow_template" translate="label comment" type="text"
+                       sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>PDP Fitment Badge Overflow</label>
+                    <comment><![CDATA[
+                        When a product fits more than 3 vehicles, the badge shows a "+N more"
+                        marker. Default: <em>and {count} more</em>. Supports the
+                        <code>{count}</code> placeholder. Phone shop: "and {count} other phones".
+                    ]]></comment>
+                </field>
+                <field id="garage_title" translate="label comment" type="text"
+                       sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Garage Widget Title</label>
+                    <comment>Default: "My Garage". Watch shop: "My Watches". Phone shop: "My Phones".</comment>
+                </field>
+                <field id="garage_clear" translate="label comment" type="text"
+                       sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Garage Clear-All Button</label>
+                    <comment>Default: "Clear Garage". Watch shop: "Clear All Watches".</comment>
+                </field>
+                <field id="garage_remove" translate="label comment" type="text"
+                       sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Garage Remove Button (aria-label)</label>
+                    <comment>Tooltip for the "X" remove button. Default: "Remove"</comment>
+                </field>
+                <field id="saved_feedback" translate="label comment" type="text"
+                       sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>"Saved!" Confirmation Text</label>
+                    <comment>Shown for ~1.5s after a successful save-to-garage. Default: "Saved!"</comment>
+                </field>
+                <field id="sidebar_no_filters" translate="label comment" type="text"
+                       sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sidebar "No Filters" Message</label>
+                    <comment>Shown in the Find page sidebar when no filters are picked. Default: "No filters active."</comment>
+                </field>
+                <field id="oem_button" translate="label comment" type="text"
+                       sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>OEM Search Submit Button</label>
+                    <comment>Text on the submit button next to the OEM search input. Default: "Search"</comment>
+                </field>
+
+                <field id="tooltip_fitment" translate="label comment tooltip" type="textarea"
+                       sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>PDP Fitment Badge Tooltip</label>
+                    <tooltip>Optional hover tooltip on the "Fits:" badge.</tooltip>
+                    <comment><![CDATA[
+                        Hover tooltip (HTML title="") on the PDP fitment badge.<br/>
+                        Optional. Leave blank to render no tooltip. Suggested text:<br/>
+                        <em>"This list shows the vehicles this part fits. Match your car's
+                        Make, Model and Year to confirm."</em><br/>
+                        Phone shop: <em>"Compatible with the phones listed. Match your
+                        phone model to confirm fit."</em>
+                    ]]></comment>
+                </field>
+                <field id="tooltip_garage" translate="label comment tooltip" type="textarea"
+                       sortOrder="210" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>My Garage Tooltip</label>
+                    <tooltip>Optional hover tooltip on the My Garage widget title.</tooltip>
+                    <comment><![CDATA[
+                        Hover tooltip on the My Garage widget. Suggested:<br/>
+                        <em>"Vehicles you've saved for quick reload. Click any vehicle
+                        to filter the catalog by that fit. Saved per browser; sync'd
+                        across devices when logged in."</em>
+                    ]]></comment>
+                </field>
+                <field id="tooltip_oem" translate="label comment tooltip" type="textarea"
+                       sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>OEM Search Tooltip</label>
+                    <tooltip>Optional hover tooltip on the OEM search input field.</tooltip>
+                    <comment><![CDATA[
+                        Hover tooltip on the OEM search box. Suggested:<br/>
+                        <em>"Paste a part number (OEM, MPN, or your store's SKU) to find
+                        the matching product directly. Faster than clicking through the
+                        vehicle dropdowns if you already know the number."</em>
+                    ]]></comment>
+                </field>
+
+                <field id="accent_colour" translate="label comment tooltip" type="text"
+                       sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Accent Colour (hex)</label>
+                    <validate>validate-not-empty</validate>
+                    <tooltip>Hex colour for filter chips + buttons. Default #0535F5 (eTechFlow blue).</tooltip>
+                    <comment><![CDATA[
+                        Six-digit hex colour used for filter chips on the Find page,
+                        the OEM Search submit button, and Garage links. Default:
+                        <code>#0535F5</code> (eTechFlow blue).<br/>
+                        Set to match your brand. Examples:<br/>
+                        - <code>#16A34A</code> (green)<br/>
+                        - <code>#DC2626</code> (red)<br/>
+                        - <code>#7C3AED</code> (purple)<br/>
+                        Anything that doesn't parse as a 6-digit hex falls back to the
+                        default. Surfaces via a CSS custom property
+                        <code>--etechflow-vc-accent</code> so your theme can also
+                        override it in CSS.
+                    ]]></comment>
+                </field>
+            </group>
+
+            <group id="garage" translate="label" type="text" sortOrder="40"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Customer Garage (v1.1.0)</label>
+                <field id="enabled" translate="label comment tooltip" type="select"
+                       sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Customer Garage</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Yes = customers can save their vehicle for one-click reload across sessions.</tooltip>
+                    <comment><![CDATA[
+                        Adds a "My Garage" feature where customers can save the vehicle they
+                        picked in the Part Finder. Next time they visit, their vehicles are
+                        already there — one click reloads the Part Finder with that vehicle.
+                        Top-3 conversion driver for parts e-commerce.<br/><br/>
+                        <strong>v1.1.0 MVP</strong>: localStorage-based (per-browser).
+                        Guest + logged-in customer get the same experience.<br/>
+                        <strong>v1.2.0+</strong>: customer attribute storage for logged-in
+                        users (syncs across devices).<br/><br/>
+                        Merchants place the widget where they want via layout XML or CMS block:<br/>
+                        <code>{{block class="ETechFlow\ProductFitmentFinder\Block\Garage"
+                          template="ETechFlow_ProductFitmentFinder::garage/widget.phtml"}}</code><br/><br/>
+                        <strong>No</strong> (default) = widget renders nothing even if placed.
+                    ]]></comment>
+                </field>
+                <field id="max_entries" translate="label comment tooltip" type="text"
+                       sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Maximum Vehicles per Customer</label>
+                    <validate>validate-number validate-greater-than-zero</validate>
+                    <tooltip>How many vehicles each customer can save. Default 3. Clamped 1-10.</tooltip>
+                    <comment><![CDATA[
+                        How many vehicles each customer can save. Default <strong>3</strong>.<br/>
+                        Anything below 1 or above 10 is clamped to safe bounds. Most stores find
+                        3 is the sweet spot — covers "my car, my wife's car, my work van".
+                    ]]></comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

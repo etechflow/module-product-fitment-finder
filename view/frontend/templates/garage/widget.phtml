@@ -1,0 +1,201 @@
+<?php
+/**
+ * "My Garage" widget.
+ *
+ * @var \ETechFlow\ProductFitmentFinder\Block\Garage $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+if (!$block->isEnabled()) {
+    return;
+}
+$storageKey = $block->getStorageKey();
+$maxEntries = $block->getMaxEntries();
+?>
+<?php $garageTooltip = $block->getGarageTooltip(); ?>
+<div class="etechflow-vc-garage" x-data="etechflowGarage('<?= $escaper->escapeJs($storageKey) ?>', <?= (int) $maxEntries ?>)" x-init="load()" x-cloak
+     <?php if ($garageTooltip !== ''): ?>title="<?= $escaper->escapeHtmlAttr($garageTooltip) ?>"<?php endif; ?>>
+    <div class="etechflow-vc-garage__panel">
+        <div class="etechflow-vc-garage__title"><?= $escaper->escapeHtml($block->getGarageTitle()) ?></div>
+
+        <!-- v1.1.1: Empty state — render an inviting prompt instead of going invisible.
+             Tells the customer the feature exists and how to use it. Configurable copy via
+             Stores → Config → Vehicle Compatibility → Customer-Facing Copy → Garage Empty Prompt. -->
+        <template x-if="vehicles.length === 0">
+            <div class="etechflow-vc-garage__empty">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                </svg>
+                <p class="etechflow-vc-garage__empty-prompt"><?= $escaper->escapeHtml($block->getGarageEmptyPrompt()) ?></p>
+            </div>
+        </template>
+
+        <template x-if="vehicles.length > 0">
+            <div>
+                <ul class="etechflow-vc-garage__list">
+                    <template x-for="(v, idx) in vehicles" :key="idx">
+                        <li class="etechflow-vc-garage__item">
+                            <button type="button"
+                                    @click="useVehicle(v)"
+                                    class="etechflow-vc-garage__use"
+                                    x-text="v.label"></button>
+                            <button type="button"
+                                    @click="remove(idx)"
+                                    class="etechflow-vc-garage__remove"
+                                    aria-label="<?= $escaper->escapeHtmlAttr($block->getGarageRemoveLabel()) ?>"
+                                    title="<?= $escaper->escapeHtmlAttr($block->getGarageRemoveLabel()) ?>">×</button>
+                        </li>
+                    </template>
+                </ul>
+                <button type="button" @click="clear()" class="etechflow-vc-garage__clear">
+                    <?= $escaper->escapeHtml($block->getGarageClearButton()) ?>
+                </button>
+            </div>
+        </template>
+    </div>
+</div>
+<script>
+window.etechflowGarage = function(storageKey, maxEntries) {
+    return {
+        vehicles: [],
+        load() {
+            try {
+                const raw = window.localStorage.getItem(storageKey);
+                this.vehicles = raw ? JSON.parse(raw) : [];
+            } catch (e) { this.vehicles = []; }
+        },
+        save() {
+            try {
+                window.localStorage.setItem(storageKey, JSON.stringify(this.vehicles.slice(0, maxEntries)));
+            } catch (e) { /* quota / private browsing */ }
+        },
+        remove(idx) {
+            this.vehicles.splice(idx, 1);
+            this.save();
+        },
+        clear() {
+            this.vehicles = [];
+            try { window.localStorage.removeItem(storageKey); } catch (e) {}
+        },
+        useVehicle(v) {
+            // Apply to the Part Finder Alpine store if it's on the page.
+            try {
+                const sel = window.Alpine && window.Alpine.store && window.Alpine.store('vehicleCompatSel');
+                if (sel) {
+                    sel.make       = v.makeId       || null;
+                    sel.makeLabel  = v.makeLabel    || '';
+                    sel.model      = v.modelId      || null;
+                    sel.modelLabel = v.modelLabel   || '';
+                    sel.year       = v.year         || null;
+                    sel.yearLabel  = v.year ? String(v.year) : '';
+                }
+            } catch (e) {}
+            // Best-effort: also navigate to the canonical Find page.
+            const u = new URL(window.location.origin + '/vehiclecompat/find/index');
+            if (v.makeId)  u.searchParams.set('make',  v.makeId);
+            if (v.modelId) u.searchParams.set('model', v.modelId);
+            if (v.year)    u.searchParams.set('year',  v.year);
+            window.location.href = u.toString();
+        }
+    };
+};
+
+/**
+ * Save the current Part Finder selection to the customer's garage.
+ * Called by the "Save This Vehicle" button on the Part Finder form.
+ */
+window.etechflowGarageSave = function(storageKey, maxEntries) {
+    try {
+        const sel = window.Alpine && window.Alpine.store && window.Alpine.store('vehicleCompatSel');
+        if (!sel || !sel.make || !sel.makeLabel) return false;
+        const parts = [sel.makeLabel];
+        if (sel.modelLabel) parts.push(sel.modelLabel);
+        if (sel.year)       parts.push(String(sel.year));
+        const v = {
+            makeId:     sel.make,
+            makeLabel:  sel.makeLabel,
+            modelId:    sel.model || null,
+            modelLabel: sel.modelLabel || '',
+            year:       sel.year || null,
+            label:      parts.join(' ')
+        };
+        const raw = window.localStorage.getItem(storageKey);
+        let arr = raw ? JSON.parse(raw) : [];
+        // De-dupe by label, then unshift to keep most-recent at top.
+        arr = arr.filter(x => x.label !== v.label);
+        arr.unshift(v);
+        arr = arr.slice(0, maxEntries);
+        window.localStorage.setItem(storageKey, JSON.stringify(arr));
+        return true;
+    } catch (e) { return false; }
+};
+</script>
+<style>
+    .etechflow-vc-garage[x-cloak] { display: none; }
+    .etechflow-vc-garage__panel {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-family: inherit;
+        font-size: 13px;
+        max-width: 320px;
+    }
+    .etechflow-vc-garage__title {
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+    .etechflow-vc-garage__list { list-style: none; margin: 0; padding: 0; }
+    .etechflow-vc-garage__empty {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #6B7280;
+        font-size: 12.5px;
+        line-height: 1.4;
+        padding: 8px 0 2px;
+    }
+    .etechflow-vc-garage__empty svg { flex-shrink: 0; opacity: 0.5; }
+    .etechflow-vc-garage__empty-prompt { margin: 0; }
+    .etechflow-vc-garage__item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+    .etechflow-vc-garage__use {
+        flex: 1;
+        text-align: left;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 13px;
+        color: #0535F5;
+        font-weight: 600;
+    }
+    .etechflow-vc-garage__use:hover { background: #eef2ff; }
+    .etechflow-vc-garage__remove {
+        width: 24px;
+        height: 24px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: #6B7280;
+        font-size: 18px;
+        line-height: 1;
+        border-radius: 4px;
+    }
+    .etechflow-vc-garage__remove:hover { background: #fee2e2; color: #dc2626; }
+    .etechflow-vc-garage__clear {
+        background: none;
+        border: 0;
+        color: #6B7280;
+        font-size: 12px;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 4px 0 0;
+    }
+</style>

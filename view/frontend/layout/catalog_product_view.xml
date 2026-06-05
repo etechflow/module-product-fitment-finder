@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!--
+            v1.1.0: PDP fitment badge. Renders "Fits: BMW 3 Series 2018-2023"
+            inline after the price. Block returns empty HTML if the merchant
+            opted out, the product has no vehicle_compat_data, or none of the
+            referenced Makes can be resolved. Theme-agnostic — same template
+            on Hyvä, Luma, and any custom theme.
+        -->
+        <referenceBlock name="product.info.main">
+            <block class="ETechFlow\ProductFitmentFinder\Block\Product\FitmentBadge"
+                   name="etechflow.vc.pdp.fitment"
+                   template="ETechFlow_ProductFitmentFinder::product/fitment-badge.phtml"
+                   after="product.info.price"/>
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="catalog_list_item"/>
+    <body>
+        <attribute name="class" value="page-with-filter"/>
+        <attribute name="class" value="page-products"/>
+        <attribute name="class" value="catalog-category-view"/>
+
+        <referenceContainer name="sidebar.main">
+            <block class="ETechFlow\ProductFitmentFinder\Block\FilterChips"
+                   name="vehiclecompat.sidebar.summary"
+                   template="ETechFlow_ProductFitmentFinder::find/sidebar.phtml"
+                   cacheable="false"/>
+        </referenceContainer>
+
+        <referenceContainer name="content">
+            <block class="ETechFlow\ProductFitmentFinder\Block\FindResults"
+                   name="vehiclecompat.find.results"
+                   template="ETechFlow_ProductFitmentFinder::find/results.phtml"
+                   cacheable="false"/>
+        </referenceContainer>
+
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Find Your Parts</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

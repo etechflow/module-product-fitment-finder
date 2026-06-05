@@ -1,0 +1,38 @@
+<?php
+/**
+ * Single source of CSS + JS for the Find-Your-Parts form. Loaded once per
+ * page (in header.phtml) so all three form locations share the same look.
+ */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<style>
+.vc-row{position:relative;display:flex;align-items:center;border:1px solid #E5E7EB;border-radius:0.45rem;margin-bottom:0.4rem;background:#fff;overflow:visible;min-height:38px}
+.vc-row:focus-within{border-color:#0535F5}
+
+.vc-ico-left{position:absolute;left:0.7rem;top:50%;transform:translateY(-50%);pointer-events:none;color:#6B7280;display:flex;align-items:center;justify-content:center;z-index:1}
+.vc-chev{position:absolute;right:0.8rem;top:50%;transform:translateY(-50%);pointer-events:none;color:#6B7280;display:flex;align-items:center;justify-content:center}
+
+.vc-trigger{flex:1;width:100%;border:none;outline:none;padding:0.6rem 2.4rem 0.6rem 2.4rem;font-size:13.5px;color:#0E1025;background:transparent;font-family:inherit;font-weight:600;text-align:left;cursor:pointer;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vc-trigger.is-empty{color:#6B7280;font-weight:500}
+.vc-trigger:disabled{cursor:not-allowed;opacity:.6}
+
+.vc-clear{position:absolute;right:2.1rem;top:50%;transform:translateY(-50%);background:#F3F4F6;border:none;color:#6B7280;font-size:14px;line-height:1;cursor:pointer;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;z-index:2}
+.vc-clear:hover{background:#FEE2E2;color:#C41818}
+
+.vc-panel{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid #E5E7EB;border-radius:0.45rem;box-shadow:0 8px 24px -8px rgba(0,0,0,.15);z-index:50;display:flex;flex-direction:column;max-height:320px}
+.vc-search{position:relative;padding:8px;border-bottom:1px solid #F3F4F6;flex-shrink:0}
+.vc-search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#9CA3AF;pointer-events:none}
+.vc-search input{width:100%;padding:7px 10px 7px 30px;border:1px solid #E5E7EB;border-radius:6px;font-size:13px;color:#0E1025;outline:none;font-family:inherit;background:#fff}
+.vc-search input:focus{border-color:#0535F5;box-shadow:0 0 0 2px rgba(5,53,245,.15)}
+
+.vc-list{overflow-y:auto;max-height:260px}
+.vc-opt{padding:0.55rem 0.9rem;font-size:13.5px;color:#0E1025;cursor:pointer;border-bottom:1px solid #F3F4F6}
+.vc-opt:last-child{border-bottom:none}
+.vc-opt:hover{background:#EEF2FF;color:#0535F5}
+.vc-empty{padding:0.65rem 0.9rem;font-size:12.5px;color:#9CA3AF;text-align:center}
+
+.vc-submit{display:flex;align-items:center;justify-content:center;gap:0.55rem;width:100%;background:#C41818;color:#fff;padding:0.75rem;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;border-radius:0.45rem;border:none;cursor:pointer;font-family:inherit;margin-top:0.4rem;box-sizing:border-box;transition:background .15s}
+.vc-submit:hover{background:#A31313}
+
+[x-cloak]{display:none !important}
+</style>

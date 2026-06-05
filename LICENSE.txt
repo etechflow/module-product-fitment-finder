@@ -1,0 +1,22 @@
+ETechFlow Commercial Licence — Vehicle Compatibility
+
+Copyright (c) 2026 eTechFlow Pvt. Ltd.
+
+This software is proprietary. Use requires a valid per-installation
+licence key issued by eTechFlow, or activation under an eTechFlow
+bundle key.
+
+Production hosts: a paid licence is required to run this module in a
+production environment. Without a valid licence the module silently
+disables itself.
+
+Non-production hosts: development, staging, *.magento.cloud,
+*.localhost, *.local, *.test and similar dev-domain patterns are
+auto-detected and bypass the licence check entirely so developers can
+work without a key.
+
+Redistribution, sublicensing, removal of licence checks, and use beyond
+the licensed installation are prohibited.
+
+For commercial licences, bundle options, and support:
+  https://etechflow.com  •  info@etechflow.com

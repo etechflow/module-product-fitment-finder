@@ -1,0 +1,37 @@
+<?php
+/** @var \ETechFlow\ProductFitmentFinder\Block\FilterChips $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$chips = $block->getChips();
+if (empty($chips)) return;
+?>
+<style>
+    /* When the vehicle filter is active, the SHOP BY left sidebar is hidden
+       (Layer plugin doesn't support faceted aggregation on our custom collection).
+       Reclaim that space for the product grid so the layout doesn't look broken. */
+    body:has(.vc-cat-chips) .sidebar-main,
+    body:has(.vc-cat-chips) aside.sidebar-main,
+    body:has(.vc-cat-chips) .sidebar.sidebar-main { display: none !important; }
+
+    body:has(.vc-cat-chips) .columns {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 330px) !important;
+    }
+    @media (max-width: 1023px) {
+        body:has(.vc-cat-chips) .columns {
+            grid-template-columns: minmax(0, 1fr) !important;
+        }
+    }
+</style>
+<div class="vc-cat-chips" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;padding:12px 14px;background:#f7f8fb;border-radius:10px">
+    <span style="font-size:.78rem;color:#6b7280;font-weight:700;margin-right:4px"><?= $escaper->escapeHtml(__('Filtering by:')) ?></span>
+    <?php foreach ($chips as $c): ?>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:<?= $escaper->escapeHtmlAttr($c['color']) ?>;color:#fff;border-radius:20px;font-size:.78rem;font-weight:700">
+            <span style="opacity:.85;font-weight:500"><?= $escaper->escapeHtml($c['label']) ?>:</span>
+            <span><?= $escaper->escapeHtml($c['value']) ?></span>
+        </span>
+    <?php endforeach; ?>
+    <a href="<?= $escaper->escapeUrl($block->getClearUrl()) ?>"
+       style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:transparent;color:#374151;border:1px solid #d1d5db;border-radius:20px;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .15s">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        <?= $escaper->escapeHtml(__('Clear filters')) ?>
+    </a>
+</div>

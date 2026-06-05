@@ -1,0 +1,7 @@
+<?php
+/** @var \ETechFlow\ProductFitmentFinder\Block\PreloadLcpImage $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$url = $block->getLcpImageUrl();
+if (!$url): return ''; endif;
+?>
+<link rel="preload" as="image" href="<?= $escaper->escapeUrl($url) ?>" fetchpriority="high">
