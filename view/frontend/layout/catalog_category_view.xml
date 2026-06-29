@@ -6,8 +6,7 @@
             <block class="ETechFlow\ProductFitmentFinder\Block\FilterChips"
                    name="vehiclecompat.category.filter.chips"
                    template="ETechFlow_ProductFitmentFinder::find/category-chips.phtml"
-                   before="-"
-                   cacheable="false"/>
+                   before="-"/>
         </referenceContainer>
     </body>
 </page>
