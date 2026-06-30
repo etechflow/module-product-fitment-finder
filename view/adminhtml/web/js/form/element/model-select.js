@@ -71,10 +71,19 @@ define([
             });
             this.options(filtered);
 
-            // If the currently-selected model isn't in the filtered list, clear it
+            // If the currently-selected model isn't in the filtered list, clear it.
+            // Type-tolerant compare: option values arrive as ints from PHP but a
+            // select's value() is often a string — a strict _.findWhere() would
+            // fail to match a legitimately-selected model and null out model_id,
+            // which then got dropped on save. Compare as ints instead.
             var cur = parseInt(this.value(), 10);
-            if (cur && !_.findWhere(filtered, {value: cur})) {
-                this.value(null);
+            if (cur) {
+                var stillValid = _.some(filtered, function (o) {
+                    return parseInt(o.value, 10) === cur;
+                });
+                if (!stillValid) {
+                    this.value(null);
+                }
             }
         }
     });

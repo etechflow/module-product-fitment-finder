@@ -299,7 +299,9 @@ class VehicleCompat extends AbstractModifier
                         'label'         => __('Model'),
                         'dataScope'     => 'model_id',
                         'options'       => $this->modelSource->toOptionArray(),
-                        'validation'    => ['required-entry' => true],
+                        // Model is optional: a Make-only fitment is valid and
+                        // persists (see JsonBackend). Requiring it here blocked
+                        // the whole product save whenever the Model wasn't set.
                         'sortOrder'     => 20,
                     ],
                 ],

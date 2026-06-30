@@ -56,7 +56,12 @@ class JsonBackend extends AbstractBackend
             /* Flat shape */
             $makeId  = (int)($row['make_id'] ?? 0);
             $modelId = (int)($row['model_id'] ?? 0);
-            if ($makeId <= 0 || $modelId <= 0) continue;
+            // A Make is required; the Model is optional. A Make-only fitment
+            // ("fits all BMW") is valid for universal parts and the PDP badge
+            // already renders it — so we no longer discard a row that has a
+            // Make but no Model (previously this silently dropped the row and
+            // wiped vehicle_compat_data on save).
+            if ($makeId <= 0) continue;
             $out[] = [
                 'make_id'    => $makeId,
                 'make_name'  => (string)($row['make_name'] ?? ''),

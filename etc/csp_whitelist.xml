@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+  The Part Finder widget runs on Alpine.js. On non-Hyvä themes the bootstrap
+  shim (view/frontend/web/js/alpine-bootstrap.js) lazy-loads Alpine from
+  cdn.jsdelivr.net. Without this whitelist that script is blocked the moment a
+  store runs CSP in restrict/enforce mode, which silently kills the storefront
+  finder. Whitelisting the CDN here keeps the module self-contained on any CSP
+  posture. (For a zero-CDN install, self-host Alpine and this entry is harmless.)
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="etechflow_pff_alpine_jsdelivr" type="host">cdn.jsdelivr.net</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
