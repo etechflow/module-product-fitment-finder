@@ -92,29 +92,72 @@ $eagerLoadImagesCount = 4;
             <?= $escaper->escapeHtml(__('%1 product(s) match your selection', $count)) ?>
         </p>
 
+        <?php
+        $items = array_values($collection->getItems());
+        // Use Hyva's ProductListItem cards ONLY under an actual Hyva theme. On
+        // Luma/custom themes the ViewModel may exist (Hyva module installed) but
+        // renders empty, so we use the built-in fallback card below — keeping the
+        // grid populated on every theme.
+        $useHyvaCards = $productListItemViewModel !== null && $block->isHyvaTheme();
+        ?>
         <section class="py-6" id="product-list" aria-label="<?= $escaper->escapeHtmlAttr(__('Product list')) ?>" tabindex="-1">
             <div class="products wrapper mode-grid products-grid">
                 <ul role="list"
-                    class="mx-auto pt-4 pb-8 grid gap-2.5 grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                    <?php foreach (array_values($collection->getItems()) as $i => $product): ?>
+                    class="mx-auto pt-4 pb-8 grid gap-2.5 grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5<?= $useHyvaCards ? '' : ' vc-results-grid' ?>">
+                    <?php foreach ($items as $i => $product): ?>
                         <?php if ($i < $eagerLoadImagesCount):
                             $product->setData('image_custom_attributes', ['loading' => 'eager', 'fetchpriority' => 'high']);
                         endif; ?>
                         <li class="flex flex-col">
-                            <?php if ($productListItemViewModel !== null):
+                            <?php
                                 $itemHtml = '';
-                                try {
-                                    $itemHtml = $productListItemViewModel->getItemHtml(
-                                        $product,
-                                        $block,
-                                        $viewMode,
-                                        $templateType,
-                                        $imageDisplayArea,
-                                        $showDescription
-                                    );
-                                } catch (\Throwable $e) { /* fall through */ }
-                                echo /* @noEscape */ $itemHtml;
-                            endif; ?>
+                                if ($useHyvaCards) {
+                                    try {
+                                        $itemHtml = (string) $productListItemViewModel->getItemHtml(
+                                            $product,
+                                            $block,
+                                            $viewMode,
+                                            $templateType,
+                                            $imageDisplayArea,
+                                            $showDescription
+                                        );
+                                    } catch (\Throwable $e) { $itemHtml = ''; }
+                                }
+                                if (trim($itemHtml) !== ''):
+                                    echo /* @noEscape */ $itemHtml;
+                                else:
+                                /* Non-Hyva (Luma / custom theme) fallback. The Hyva
+                                   ProductListItem ViewModel only exists under Hyva, so
+                                   without this branch the grid is empty on every other
+                                   theme. Render a real product card from the block's own
+                                   helpers (image / url / price) + a standard add-to-cart
+                                   so the Find page shows products on EVERY theme. */
+                                $vcUrl   = $block->getProductDetailUrl($product);
+                                $vcImg   = $block->getProductImageUrl($product);
+                                $vcName  = (string) $product->getName();
+                                $vcPrice = $block->formatPrice($product);
+                            ?>
+                                <div class="vc-card">
+                                    <a class="vc-card-media" href="<?= $escaper->escapeUrl($vcUrl) ?>" tabindex="-1" aria-hidden="true">
+                                        <?php if ($vcImg !== ''): ?>
+                                            <img src="<?= $escaper->escapeUrl($vcImg) ?>"
+                                                 alt="<?= $escaper->escapeHtmlAttr($vcName) ?>"
+                                                 width="240" height="240"
+                                                 loading="<?= $i < $eagerLoadImagesCount ? 'eager' : 'lazy' ?>">
+                                        <?php endif; ?>
+                                    </a>
+                                    <a class="vc-card-name" href="<?= $escaper->escapeUrl($vcUrl) ?>"><?= $escaper->escapeHtml($vcName) ?></a>
+                                    <?php if ($vcPrice !== ''): ?>
+                                        <div class="vc-card-price"><?= $escaper->escapeHtml($vcPrice) ?></div>
+                                    <?php endif; ?>
+                                    <form class="vc-card-form" action="<?= $escaper->escapeUrl($block->getAddToCartUrl($product)) ?>" method="post">
+                                        <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>">
+                                        <input type="hidden" name="product" value="<?= (int) $product->getId() ?>">
+                                        <input type="hidden" name="qty" value="1">
+                                        <button type="submit" class="vc-card-cart"><?= $escaper->escapeHtml(__('Add to Cart')) ?></button>
+                                    </form>
+                                </div>
+                            <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -125,3 +168,21 @@ $eagerLoadImagesCount = 4;
     <?php endif; ?>
 
 </div>
+<?php /* Fallback grid + card styles. The .vc-results-grid class is only added to
+        the <ul> on non-Hyva themes (where Tailwind isn't compiled), so Hyva's own
+        grid is untouched; the .vc-card rules style the fallback cards everywhere. */ ?>
+<style>
+    .vc-find-page .vc-results-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;list-style:none;margin:0;padding:0}
+    @media(min-width:640px){.vc-find-page .vc-results-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(min-width:1024px){.vc-find-page .vc-results-grid{grid-template-columns:repeat(4,1fr)}}
+    .vc-find-page .vc-results-grid>li{display:flex;flex-direction:column}
+    .vc-card{display:flex;flex-direction:column;height:100%;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff}
+    .vc-card-media{display:block;aspect-ratio:1/1;background:#f7f8fb}
+    .vc-card-media img{width:100%;height:100%;object-fit:contain;display:block}
+    .vc-card-name{display:block;padding:10px 12px 4px;font-size:.86rem;font-weight:600;line-height:1.3;color:#0E1025;text-decoration:none}
+    .vc-card-name:hover{color:var(--etechflow-vc-accent,#0535F5)}
+    .vc-card-price{padding:2px 12px 0;font-size:.98rem;font-weight:800;color:#0E1025}
+    .vc-card-form{margin-top:auto;padding:10px 12px 12px}
+    .vc-card-cart{width:100%;padding:.55rem;background:var(--etechflow-vc-accent,#0535F5);color:#fff;border:0;border-radius:.4rem;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit}
+    .vc-card-cart:hover{filter:brightness(.92)}
+</style>

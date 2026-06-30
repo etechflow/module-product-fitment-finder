@@ -27,8 +27,11 @@ class FindResults extends Template
     private ResourceConnection $resource;
     private StoreManagerInterface $storeManager;
     private \ETechFlow\ProductFitmentFinder\Model\Config $vcConfig;
+    private \Magento\Framework\Data\Form\FormKey $formKey;
+    private \Magento\Framework\View\DesignInterface $design;
 
     private ?Collection $cachedCollection = null;
+    private ?bool $isHyva = null;
 
     public function __construct(
         Context $context,
@@ -39,6 +42,8 @@ class FindResults extends Template
         ResourceConnection $resource,
         StoreManagerInterface $storeManager,
         \ETechFlow\ProductFitmentFinder\Model\Config $vcConfig,
+        \Magento\Framework\Data\Form\FormKey $formKey,
+        \Magento\Framework\View\DesignInterface $design,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -49,6 +54,48 @@ class FindResults extends Template
         $this->resource = $resource;
         $this->storeManager = $storeManager;
         $this->vcConfig = $vcConfig;
+        $this->formKey = $formKey;
+        $this->design = $design;
+    }
+
+    /**
+     * Is the ACTIVE frontend theme a Hyva theme? Decisive gate for which product
+     * card to render on the Find page: Hyva's ProductListItem ViewModel only emits
+     * a card under a Hyva theme. The ViewModel can be present (Hyva module
+     * installed) yet render empty on a Luma/custom theme, so we check the theme
+     * chain rather than whether the ViewModel is non-null.
+     */
+    public function isHyvaTheme(): bool
+    {
+        if ($this->isHyva !== null) {
+            return $this->isHyva;
+        }
+        $this->isHyva = false;
+        try {
+            $theme = $this->design->getDesignTheme();
+            while ($theme) {
+                if (stripos((string) $theme->getCode(), 'hyva') !== false) {
+                    $this->isHyva = true;
+                    break;
+                }
+                $theme = $theme->getParentTheme();
+            }
+        } catch (\Throwable $e) {
+            $this->isHyva = false;
+        }
+        return $this->isHyva;
+    }
+
+    /** Form key for the non-Hyva fallback add-to-cart form (find page is uncacheable). */
+    public function getFormKey(): string
+    {
+        return $this->formKey->getFormKey();
+    }
+
+    /** Standard add-to-cart action URL for a product (non-Hyva fallback card). */
+    public function getAddToCartUrl(Product $product): string
+    {
+        return $this->_urlBuilder->getUrl('checkout/cart/add', ['product' => (int) $product->getId()]);
     }
 
     /** v1.1.1 — admin-configurable copy for the Find page. */
