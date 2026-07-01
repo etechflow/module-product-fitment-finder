@@ -12,7 +12,7 @@ $storageKey = $block->getStorageKey();
 $maxEntries = $block->getMaxEntries();
 ?>
 <?php $garageTooltip = $block->getGarageTooltip(); ?>
-<div class="etechflow-vc-garage" x-data="etechflowGarage('<?= $escaper->escapeJs($storageKey) ?>', <?= (int) $maxEntries ?>)" x-init="load()" x-cloak
+<div class="etechflow-vc-garage" x-data="etechflowGarage('<?= $escaper->escapeJs($storageKey) ?>', <?= (int) $maxEntries ?>)" x-init="load()" @etechflow-garage-updated.window="load()" x-cloak
      <?php if ($garageTooltip !== ''): ?>title="<?= $escaper->escapeHtmlAttr($garageTooltip) ?>"<?php endif; ?>>
     <div class="etechflow-vc-garage__panel">
         <div class="etechflow-vc-garage__title"><?= $escaper->escapeHtml($block->getGarageTitle()) ?></div>
@@ -89,11 +89,14 @@ window.etechflowGarage = function(storageKey, maxEntries) {
                     sel.yearLabel  = v.year ? String(v.year) : '';
                 }
             } catch (e) {}
-            // Best-effort: also navigate to the canonical Find page.
+            // Navigate to the Find page using the SAME param names the results
+            // read (make_id/model_id/year) — NOT make/model, which silently
+            // filtered nothing. The server then 301s this to the pretty
+            // /parts/<make>/<model> URL.
             const u = new URL(window.location.origin + '/vehiclecompat/find/index');
-            if (v.makeId)  u.searchParams.set('make',  v.makeId);
-            if (v.modelId) u.searchParams.set('model', v.modelId);
-            if (v.year)    u.searchParams.set('year',  v.year);
+            if (v.makeId)  u.searchParams.set('make_id',  v.makeId);
+            if (v.modelId) u.searchParams.set('model_id', v.modelId);
+            if (v.year)    u.searchParams.set('year',     v.year);
             window.location.href = u.toString();
         }
     };
@@ -125,6 +128,9 @@ window.etechflowGarageSave = function(storageKey, maxEntries) {
         arr.unshift(v);
         arr = arr.slice(0, maxEntries);
         window.localStorage.setItem(storageKey, JSON.stringify(arr));
+        // Tell any My Garage widget on the page to refresh so the saved vehicle
+        // shows immediately (no page reload needed).
+        window.dispatchEvent(new CustomEvent('etechflow-garage-updated'));
         return true;
     } catch (e) { return false; }
 };

@@ -24,6 +24,14 @@
                     <argument name="show_when_empty" xsi:type="boolean">true</argument>
                 </arguments>
             </block>
+            <!-- My Garage: self-hides until enabled in admin (Saved Garage → Enable).
+                 Placed alongside the finder so its Save Selection button + the garage
+                 share a page (the garage template defines etechflowGarageSave). -->
+            <block class="ETechFlow\ProductFitmentFinder\Block\Garage"
+                   name="vehiclecompat.garage"
+                   template="ETechFlow_ProductFitmentFinder::garage/widget.phtml"
+                   after="vehiclecompat.sidebar.summary"
+                   cacheable="false"/>
         </referenceContainer>
 
         <referenceContainer name="content">
