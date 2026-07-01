@@ -254,3 +254,89 @@ function vehicleCompatPartFinder(carKeysPartsBaseUrl, optionsUrl) {
         }
     };
 }
+
+// ---------------------------------------------------------------------------
+// Customer Garage — defined GLOBALLY (loaded on every page by default.xml) so
+// the finder's "Save Selection" button works wherever the finder appears, not
+// only on the page where the My Garage widget is placed. Previously these lived
+// in garage/widget.phtml, so etechflowGarageSave was undefined on category/home
+// pages and the Save button silently did nothing.
+// ---------------------------------------------------------------------------
+window.etechflowGarage = function(storageKey, maxEntries) {
+    return {
+        vehicles: [],
+        load() {
+            try {
+                const raw = window.localStorage.getItem(storageKey);
+                this.vehicles = raw ? JSON.parse(raw) : [];
+            } catch (e) { this.vehicles = []; }
+        },
+        save() {
+            try {
+                window.localStorage.setItem(storageKey, JSON.stringify(this.vehicles.slice(0, maxEntries)));
+            } catch (e) { /* quota / private browsing */ }
+        },
+        remove(idx) {
+            this.vehicles.splice(idx, 1);
+            this.save();
+        },
+        clear() {
+            this.vehicles = [];
+            try { window.localStorage.removeItem(storageKey); } catch (e) {}
+        },
+        useVehicle(v) {
+            // Apply to the Part Finder Alpine store if it's on the page.
+            try {
+                const sel = window.Alpine && window.Alpine.store && window.Alpine.store('vehicleCompatSel');
+                if (sel) {
+                    sel.make       = v.makeId       || null;
+                    sel.makeLabel  = v.makeLabel    || '';
+                    sel.model      = v.modelId      || null;
+                    sel.modelLabel = v.modelLabel   || '';
+                    sel.year       = v.year         || null;
+                    sel.yearLabel  = v.year ? String(v.year) : '';
+                }
+            } catch (e) {}
+            // Navigate using make_id/model_id/year (the params results read); the
+            // server then 301s to the pretty /parts/<make>/<model> URL.
+            const u = new URL(window.location.origin + '/vehiclecompat/find/index');
+            if (v.makeId)  u.searchParams.set('make_id',  v.makeId);
+            if (v.modelId) u.searchParams.set('model_id', v.modelId);
+            if (v.year)    u.searchParams.set('year',     v.year);
+            window.location.href = u.toString();
+        }
+    };
+};
+
+/**
+ * Save the current Part Finder selection to the customer's garage.
+ * Called by the "Save Selection" button on the Part Finder form.
+ */
+window.etechflowGarageSave = function(storageKey, maxEntries) {
+    try {
+        const sel = window.Alpine && window.Alpine.store && window.Alpine.store('vehicleCompatSel');
+        if (!sel || !sel.make || !sel.makeLabel) return false;
+        const parts = [sel.makeLabel];
+        if (sel.modelLabel) parts.push(sel.modelLabel);
+        if (sel.year)       parts.push(String(sel.year));
+        const v = {
+            makeId:     sel.make,
+            makeLabel:  sel.makeLabel,
+            modelId:    sel.model || null,
+            modelLabel: sel.modelLabel || '',
+            year:       sel.year || null,
+            label:      parts.join(' ')
+        };
+        const raw = window.localStorage.getItem(storageKey);
+        let arr = raw ? JSON.parse(raw) : [];
+        // De-dupe by label, then unshift to keep most-recent at top.
+        arr = arr.filter(x => x.label !== v.label);
+        arr.unshift(v);
+        arr = arr.slice(0, maxEntries);
+        window.localStorage.setItem(storageKey, JSON.stringify(arr));
+        // Tell any My Garage widget on the page to refresh so the saved vehicle
+        // shows immediately (no page reload needed).
+        window.dispatchEvent(new CustomEvent('etechflow-garage-updated'));
+        return true;
+    } catch (e) { return false; }
+};
