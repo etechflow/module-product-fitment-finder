@@ -83,4 +83,23 @@ class PartFinder extends Template implements BlockInterface
     public function getFindButtonText(): string  { return $this->config->getFindButtonText(); }
     public function isSavedGarageEnabled(): bool { return $this->config->isSavedGarageEnabled(); }
     public function getSaveButtonText(): string  { return $this->config->getSaveButtonText(); }
+
+    /**
+     * Admin-controlled placement gate. Layout placements (home / product /
+     * product_list) are tagged with a `vc_location` arg and render only when they
+     * match the single location the admin picked in
+     * Stores → Config → Product Fitment Finder → Part Finder Placement.
+     *
+     * Instances WITHOUT a vc_location arg — the Find page's own sidebar form and
+     * any merchant-dropped {{widget}} / CMS block — are never gated, so they
+     * always render.
+     */
+    protected function _toHtml()
+    {
+        $location = (string) $this->getData('vc_location');
+        if ($location !== '' && !$this->config->isPartFinderEnabledFor($location)) {
+            return '';
+        }
+        return parent::_toHtml();
+    }
 }

@@ -16,6 +16,9 @@
                 <label_year>Year</label_year>
                 <label_part>Parts Required</label_part>
             </general>
+            <placement>
+                <location>product_list</location>
+            </placement>
             <pdp_badge>
                 <enabled>0</enabled>
                 <prefix>Fits:</prefix>

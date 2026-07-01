@@ -26,6 +26,9 @@ class Config
     private const XML_PATH_LABEL_YEAR           = 'etechflow_vehiclecompat/general/label_year';
     private const XML_PATH_LABEL_PART           = 'etechflow_vehiclecompat/general/label_part';
 
+    // v2.1.0 — admin-controlled storefront placement of the Part Finder form
+    private const XML_PATH_PLACEMENT_LOCATION   = 'etechflow_vehiclecompat/placement/location';
+
     // v1.1.0 — PDP fitment badge
     private const XML_PATH_SHOW_PDP_BADGE       = 'etechflow_vehiclecompat/pdp_badge/enabled';
     private const XML_PATH_PDP_BADGE_PREFIX     = 'etechflow_vehiclecompat/pdp_badge/prefix';
@@ -72,6 +75,9 @@ class Config
 
     /** Allowed badge style modifiers — clamped against this whitelist. */
     private const BADGE_STYLES = ['success', 'info', 'warning', 'neutral'];
+
+    /** Valid Part Finder placement locations — anything else means "not placed". */
+    private const PLACEMENT_LOCATIONS = ['home', 'product', 'product_list'];
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig
@@ -124,6 +130,30 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
+    }
+
+    /**
+     * v2.1.0 — where the admin has chosen to auto-place the Part Finder form.
+     * One of 'home' | 'product' | 'product_list', or '' when set to "don't
+     * auto-place" (the merchant then uses the widget). Clamped to the whitelist.
+     */
+    public function getPartFinderLocation(?int $storeId = null): string
+    {
+        $value = (string) $this->scopeConfig->getValue(
+            self::XML_PATH_PLACEMENT_LOCATION,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+        return in_array($value, self::PLACEMENT_LOCATIONS, true) ? $value : '';
+    }
+
+    /**
+     * Should a Part Finder placement tagged with $location render? True only when
+     * it matches the single admin-selected location.
+     */
+    public function isPartFinderEnabledFor(string $location, ?int $storeId = null): bool
+    {
+        return $location !== '' && $location === $this->getPartFinderLocation($storeId);
     }
 
     public function getMakeLabel(?int $storeId = null): string

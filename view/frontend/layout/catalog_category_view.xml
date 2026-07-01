@@ -15,6 +15,7 @@
                    template="ETechFlow_ProductFitmentFinder::partfinder/widget.phtml"
                    before="-">
                 <arguments>
+                    <argument name="vc_location" xsi:type="string">product_list</argument>
                     <argument name="vc_size" xsi:type="string">sm</argument>
                 </arguments>
             </block>

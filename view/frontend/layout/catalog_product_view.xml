@@ -14,6 +14,19 @@
                    name="etechflow.vc.pdp.fitment"
                    template="ETechFlow_ProductFitmentFinder::product/fitment-badge.phtml"
                    after="product.info.price"/>
+            <!--
+                Part Finder form on the product page. Renders only when
+                Part Finder Placement = "Product Page" (gated via vc_location).
+            -->
+            <block class="ETechFlow\ProductFitmentFinder\Block\Widget\PartFinder"
+                   name="vehiclecompat.product.partfinder"
+                   template="ETechFlow_ProductFitmentFinder::partfinder/widget.phtml"
+                   after="etechflow.vc.pdp.fitment">
+                <arguments>
+                    <argument name="vc_location" xsi:type="string">product</argument>
+                    <argument name="vc_size" xsi:type="string">sm</argument>
+                </arguments>
+            </block>
         </referenceBlock>
     </body>
 </page>

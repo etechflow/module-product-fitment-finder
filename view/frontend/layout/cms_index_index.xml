@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+    Home page placement of the Part Finder form. Renders only when
+    Stores → Config → Product Fitment Finder → Part Finder Placement = "Home Page"
+    (gated by Block\Widget\PartFinder::_toHtml() via the vc_location arg).
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="ETechFlow\ProductFitmentFinder\Block\Widget\PartFinder"
+                   name="vehiclecompat.home.partfinder"
+                   template="ETechFlow_ProductFitmentFinder::partfinder/widget.phtml"
+                   before="-">
+                <arguments>
+                    <argument name="vc_location" xsi:type="string">home</argument>
+                    <argument name="vc_size" xsi:type="string">md</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

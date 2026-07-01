@@ -16,6 +16,17 @@
             <tab>etechflow</tab>
             <resource>ETechFlow_ProductFitmentFinder::config</resource>
 
+            <group id="placement" translate="label" type="text" sortOrder="12"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Part Finder Placement</label>
+                <field id="location" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Part Finder On</label>
+                    <source_model>ETechFlow\ProductFitmentFinder\Model\Source\PartFinderLocation</source_model>
+                    <comment><![CDATA[Where the "Find Your Parts" form is automatically shown on the storefront. Submitting it always takes the customer to the Find Your Parts <em>results</em> page. Pick "Don't auto-place" to position it yourself with the Part Finder widget (Content &#8594; Widgets) instead.]]></comment>
+                </field>
+            </group>
+
             <group id="license"
                    translate="label"
                    type="text"
