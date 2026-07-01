@@ -35,6 +35,7 @@
             <copy>
                 <find_button_text>Find Parts</find_button_text>
                 <find_page_title>Find Your Parts</find_page_title>
+                <part_finder_heading>Find Your Parts</part_finder_heading>
                 <empty_state_message>Pick a {make}, {model}, {year} or {part} to see matching products.</empty_state_message>
                 <save_button_text>Save Selection</save_button_text>
                 <garage_empty_prompt>Save a selection here for one-click reload later.</garage_empty_prompt>

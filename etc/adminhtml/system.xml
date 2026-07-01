@@ -299,6 +299,16 @@
                         <code>Find Your Strap</code>. Industrial: <code>Component Finder</code>.
                     ]]></comment>
                 </field>
+                <field id="part_finder_heading" translate="label comment tooltip" type="text"
+                       sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Part Finder Heading</label>
+                    <tooltip>Heading shown above the Part Finder form wherever it's placed (Home / Product / Category / widget). Leave blank for no heading. Default "Find Your Parts".</tooltip>
+                    <comment><![CDATA[
+                        Heading shown above the Part Finder form on whichever placement
+                        you chose (and in the widget). Default: <em>Find Your Parts</em>.
+                        Leave blank to show no heading.
+                    ]]></comment>
+                </field>
                 <field id="empty_state_message" translate="label comment tooltip" type="text"
                        sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Empty State Message</label>

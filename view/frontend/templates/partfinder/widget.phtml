@@ -12,17 +12,26 @@
  * @var \ETechFlow\ProductFitmentFinder\Block\Widget\PartFinder $block
  * @var \Magento\Framework\Escaper $escaper
  */
-$findUrl = $block->getFindUrl();
-$vcSize  = (string) ($block->getData('vc_size') ?: 'md');
+$findUrl   = $block->getFindUrl();
+$vcSize    = (string) ($block->getData('vc_size') ?: 'md');
+$vcHeading = (string) $block->getPartFinderHeading();
 ?>
 <?php /* Shared combobox CSS — pure static <style>, no dynamic content. */ ?>
 <?php include $block->getTemplateFile('ETechFlow_ProductFitmentFinder::partfinder/styles.phtml'); ?>
 <div class="vc-partfinder vc-partfinder--<?= $escaper->escapeHtmlAttr($vcSize) ?>"
      x-data="vehicleCompatPartFinder('<?= $escaper->escapeJs($findUrl) ?>')">
+    <?php if ($vcHeading !== ''): ?>
+        <h3 class="vc-partfinder__heading"><?= $escaper->escapeHtml($vcHeading) ?></h3>
+    <?php endif; ?>
     <?php include $block->getTemplateFile('ETechFlow_ProductFitmentFinder::partfinder/form.phtml'); ?>
 </div>
 <style>
     .vc-partfinder { max-width: 360px; }
+    .vc-partfinder__heading {
+        margin: 0 0 .6rem; padding: 0; font-size: 1.05rem; font-weight: 800;
+        line-height: 1.25; color: #0E1025; letter-spacing: -.01em;
+    }
+    .vc-partfinder--md .vc-partfinder__heading { font-size: 1.2rem; }
     .vc-partfinder .vc-actions { margin-top: .25rem; }
     .vc-partfinder .vc-save-selection {
         display: flex; align-items: center; justify-content: center; gap: .4rem;

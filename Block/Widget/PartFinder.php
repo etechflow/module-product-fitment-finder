@@ -75,6 +75,9 @@ class PartFinder extends Template implements BlockInterface
     // Customer-facing copy — all admin-configurable so the same form rebrands
     // to any fitment domain. Mirrors the getters PartFinderData exposes for the
     // find-page templates; both delegate to Model\Config.
+    /** Heading rendered above the form (admin-configurable; blank = no heading). */
+    public function getPartFinderHeading(): string { return $this->config->getPartFinderHeading(); }
+
     public function getMakeLabel(): string       { return $this->config->getMakeLabel(); }
     public function getModelLabel(): string      { return $this->config->getModelLabel(); }
     public function getYearLabel(): string       { return $this->config->getYearLabel(); }

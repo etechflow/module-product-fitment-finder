@@ -45,6 +45,7 @@ class Config
     // v1.1.1 — Universal customer-facing copy
     private const XML_PATH_FIND_BUTTON_TEXT     = 'etechflow_vehiclecompat/copy/find_button_text';
     private const XML_PATH_FIND_PAGE_TITLE      = 'etechflow_vehiclecompat/copy/find_page_title';
+    private const XML_PATH_PART_FINDER_HEADING  = 'etechflow_vehiclecompat/copy/part_finder_heading';
     private const XML_PATH_EMPTY_STATE_MESSAGE  = 'etechflow_vehiclecompat/copy/empty_state_message';
     private const XML_PATH_SAVE_BUTTON_TEXT     = 'etechflow_vehiclecompat/copy/save_button_text';
     private const XML_PATH_GARAGE_EMPTY_PROMPT  = 'etechflow_vehiclecompat/copy/garage_empty_prompt';
@@ -271,6 +272,20 @@ class Config
     public function getFindPageTitle(?int $storeId = null): string
     {
         return $this->labelOrDefault(self::XML_PATH_FIND_PAGE_TITLE, 'Find Your Parts', $storeId);
+    }
+
+    /**
+     * v2.1.0 — heading rendered above the embedded Part Finder form. Unlike the
+     * other copy getters this does NOT fall back to a default when blank: an
+     * empty value means "show no heading", so a merchant can hide it.
+     */
+    public function getPartFinderHeading(?int $storeId = null): string
+    {
+        return trim((string) $this->scopeConfig->getValue(
+            self::XML_PATH_PART_FINDER_HEADING,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        ));
     }
 
     /**
