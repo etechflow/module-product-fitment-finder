@@ -45,6 +45,21 @@ class Garage extends Template
         return $this->config->isEnabled() && $this->config->isSavedGarageEnabled();
     }
 
+    /**
+     * Follow the Part Finder's placement: a garage tagged with a vc_location arg
+     * renders only where the admin placed the finder (home / product /
+     * product_list). Untagged instances (the Find page sidebar, or a merchant
+     * {{block}}) always render. Mirrors Block\Widget\PartFinder::_toHtml().
+     */
+    protected function _toHtml()
+    {
+        $location = (string) $this->getData('vc_location');
+        if ($location !== '' && !$this->config->isPartFinderEnabledFor($location)) {
+            return '';
+        }
+        return parent::_toHtml();
+    }
+
     public function getMaxEntries(): int
     {
         return $this->config->getGarageMaxEntries();

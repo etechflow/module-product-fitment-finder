@@ -27,6 +27,15 @@
                     <argument name="vc_size" xsi:type="string">sm</argument>
                 </arguments>
             </block>
+            <!-- My Garage travels with the finder (Placement = Product Page). -->
+            <block class="ETechFlow\ProductFitmentFinder\Block\Garage"
+                   name="vehiclecompat.product.garage"
+                   template="ETechFlow_ProductFitmentFinder::garage/widget.phtml"
+                   after="vehiclecompat.product.partfinder">
+                <arguments>
+                    <argument name="vc_location" xsi:type="string">product</argument>
+                </arguments>
+            </block>
         </referenceBlock>
     </body>
 </page>

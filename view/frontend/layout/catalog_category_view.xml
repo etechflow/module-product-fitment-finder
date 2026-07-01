@@ -23,6 +23,16 @@
                    name="vehiclecompat.category.filter.chips"
                    template="ETechFlow_ProductFitmentFinder::find/category-chips.phtml"
                    after="vehiclecompat.category.partfinder"/>
+            <!-- My Garage travels with the finder: same vc_location so it renders
+                 only when the finder is placed here (Placement = Product List). -->
+            <block class="ETechFlow\ProductFitmentFinder\Block\Garage"
+                   name="vehiclecompat.category.garage"
+                   template="ETechFlow_ProductFitmentFinder::garage/widget.phtml"
+                   after="vehiclecompat.category.filter.chips">
+                <arguments>
+                    <argument name="vc_location" xsi:type="string">product_list</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>
