@@ -34,6 +34,7 @@ class PartFinder extends Template implements BlockInterface
     public function __construct(
         Context $context,
         private readonly Config $config,
+        private readonly \Magento\Framework\Registry $registry,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -42,9 +43,32 @@ class PartFinder extends Template implements BlockInterface
     /**
      * Base URL the "Find Parts" button navigates to, carrying the chosen
      * make/model/year/part as query params (?make_id=…&model_id=…).
+     *
+     * Target:
+     *  - an explicit `find_url` block/widget arg always wins;
+     *  - `find_target="current"` opts INTO refining the current category in place
+     *    (only reliable when layered nav honours an entity_id constraint — e.g.
+     *    flat/DB collections; OpenSearch fulltext categories do not, so this is
+     *    opt-in, not the default);
+     *  - default → the dedicated whole-catalog Find page, which renders results
+     *    reliably on every theme + every layered-nav backend.
      */
     public function getFindUrl(): string
     {
+        $explicit = (string) $this->getData('find_url');
+        if ($explicit !== '') {
+            return $explicit;
+        }
+        if ((string) $this->getData('find_target') === 'current') {
+            try {
+                $category = $this->registry->registry('current_category');
+                if ($category && (int) $category->getId() > 0) {
+                    return $category->getUrl();
+                }
+            } catch (\Throwable $e) {
+                // fall through to the Find page
+            }
+        }
         return $this->getUrl('vehiclecompat/find');
     }
 

@@ -3,10 +3,25 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
+            <!--
+                "Listing page header" placement (USAGE.md): the Part Finder form
+                right above the product grid so customers can filter the catalog by
+                their vehicle without leaving the category. getFindUrl() detects the
+                current category and refines it in place (FilterByVehicle), so the
+                Find Parts button reloads THIS category with the chosen vehicle.
+            -->
+            <block class="ETechFlow\ProductFitmentFinder\Block\Widget\PartFinder"
+                   name="vehiclecompat.category.partfinder"
+                   template="ETechFlow_ProductFitmentFinder::partfinder/widget.phtml"
+                   before="-">
+                <arguments>
+                    <argument name="vc_size" xsi:type="string">sm</argument>
+                </arguments>
+            </block>
             <block class="ETechFlow\ProductFitmentFinder\Block\FilterChips"
                    name="vehiclecompat.category.filter.chips"
                    template="ETechFlow_ProductFitmentFinder::find/category-chips.phtml"
-                   before="-"/>
+                   after="vehiclecompat.category.partfinder"/>
         </referenceContainer>
     </body>
 </page>
