@@ -138,6 +138,9 @@ class FitmentRouter implements RouterInterface
         $request->setModuleName('vehiclecompat');
         $request->setControllerName('find');
         $request->setActionName('index');
+        // NB: Find\Index skips its ugly→pretty 301 by detecting that the request
+        // path already starts with the SEO prefix (arrivedViaSeoPath), so no
+        // marker param is needed here — keeps the request params clean.
         foreach ($params as $k => $v) {
             $request->setParam($k, $v);
         }
