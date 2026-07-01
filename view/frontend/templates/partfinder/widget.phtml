@@ -16,6 +16,13 @@ $findUrl   = $block->getFindUrl();
 $vcSize    = (string) ($block->getData('vc_size') ?: 'md');
 $vcHeading = (string) $block->getPartFinderHeading();
 ?>
+<?php /* Server-resolved selection (make/model/year/part NAMES) for a pre-filled
+        finder — so it shows the vehicle name and Save Selection works on the
+        results page, where the URL carries only IDs. The finder JS reads this. */ ?>
+<?php $vcPreselect = $block->getPreselection(); ?>
+<?php if ($vcPreselect !== null): ?>
+<script>window.etechflowPreselect = <?= /* @noEscape */ json_encode($vcPreselect, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;</script>
+<?php endif; ?>
 <?php /* Shared combobox CSS — pure static <style>, no dynamic content. */ ?>
 <?php include $block->getTemplateFile('ETechFlow_ProductFitmentFinder::partfinder/styles.phtml'); ?>
 <div class="vc-partfinder vc-partfinder--<?= $escaper->escapeHtmlAttr($vcSize) ?>"

@@ -35,9 +35,71 @@ class PartFinder extends Template implements BlockInterface
         Context $context,
         private readonly Config $config,
         private readonly \Magento\Framework\Registry $registry,
+        private readonly \Magento\Framework\App\ResourceConnection $resource,
         array $data = []
     ) {
         parent::__construct($context, $data);
+    }
+
+    /**
+     * Server-resolved selection for a pre-filled finder (e.g. the Find results
+     * page reached via ?make_id=… or /parts/bmw/…). The finder JS hydrates IDs
+     * from the URL but not the NAMES, so without this the pre-filled finder shows
+     * "Select Make" and — critically — Save Selection silently fails (the garage
+     * save needs makeLabel). Emitted as window.etechflowPreselect by widget.phtml.
+     *
+     * @return array<string,string>|null null when nothing is pre-selected
+     */
+    public function getPreselection(): ?array
+    {
+        $req = $this->getRequest();
+        $makeId = (int) $req->getParam('make_id');
+        if ($makeId <= 0) {
+            return null;
+        }
+        $conn = $this->resource->getConnection();
+        $makeName = (string) $conn->fetchOne(
+            "SELECT name FROM " . $this->resource->getTableName('etechflow_vehicle_make') . " WHERE make_id = ?",
+            [$makeId]
+        );
+        if ($makeName === '') {
+            return null;
+        }
+        $sel = ['make' => (string) $makeId, 'makeLabel' => $makeName];
+
+        $modelId = (int) $req->getParam('model_id');
+        if ($modelId > 0) {
+            $modelName = (string) $conn->fetchOne(
+                "SELECT name FROM " . $this->resource->getTableName('etechflow_vehicle_model')
+                . " WHERE model_id = ? AND make_id = ?",
+                [$modelId, $makeId]
+            );
+            if ($modelName !== '') {
+                $sel['model'] = (string) $modelId;
+                $sel['modelLabel'] = $modelName;
+            }
+        }
+        $year = (int) $req->getParam('year');
+        if ($year > 0) {
+            $sel['year'] = (string) $year;
+        }
+        $partId = (int) $req->getParam('part_id');
+        if ($partId > 0) {
+            $eav = $this->resource->getTableName('eav_attribute');
+            $attrId = (int) $conn->fetchOne(
+                "SELECT attribute_id FROM $eav WHERE entity_type_id = 4 AND attribute_code = 'parts_required'"
+            );
+            $partName = $attrId ? (string) $conn->fetchOne(
+                "SELECT value FROM " . $this->resource->getTableName('eav_attribute_option_value')
+                . " WHERE option_id = ? AND store_id = 0",
+                [$partId]
+            ) : '';
+            if ($partName !== '') {
+                $sel['part'] = (string) $partId;
+                $sel['partLabel'] = $partName;
+            }
+        }
+        return $sel;
     }
 
     /**

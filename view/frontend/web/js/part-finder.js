@@ -83,17 +83,29 @@ function vehicleCompatPartFinder(carKeysPartsBaseUrl, optionsUrl) {
             const s = Alpine.store('vehicleCompatSel');
             if (!s._urlHydrated) {
                 s._urlHydrated = true;
-                try {
-                    const params = new URLSearchParams(window.location.search);
-                    const m  = params.get('make_id');
-                    const md = params.get('model_id');
-                    const y  = params.get('year');
-                    const p  = params.get('part_id');
-                    if (m  && Number(m)  > 0) s.make  = String(Number(m));
-                    if (md && Number(md) > 0) s.model = String(Number(md));
-                    if (y  && Number(y)  > 0) { s.year  = String(Number(y)); }
-                    if (p  && Number(p)  > 0) s.part  = String(Number(p));
-                } catch (e) { /* ignore */ }
+                // Prefer the server-injected preselection: it carries the NAMES
+                // (labels) and works on pretty /parts/… URLs too (where the ids
+                // aren't in the query string). Without labels, Save Selection
+                // silently fails on a pre-filled page. Fall back to URL params.
+                const pre = window.etechflowPreselect;
+                if (pre && pre.make) {
+                    s.make = String(pre.make); s.makeLabel = pre.makeLabel || '';
+                    if (pre.model) { s.model = String(pre.model); s.modelLabel = pre.modelLabel || ''; }
+                    if (pre.year)  { s.year  = String(pre.year); }
+                    if (pre.part)  { s.part  = String(pre.part); s.partLabel = pre.partLabel || ''; }
+                } else {
+                    try {
+                        const params = new URLSearchParams(window.location.search);
+                        const m  = params.get('make_id');
+                        const md = params.get('model_id');
+                        const y  = params.get('year');
+                        const p  = params.get('part_id');
+                        if (m  && Number(m)  > 0) s.make  = String(Number(m));
+                        if (md && Number(md) > 0) s.model = String(Number(md));
+                        if (y  && Number(y)  > 0) { s.year  = String(Number(y)); }
+                        if (p  && Number(p)  > 0) s.part  = String(Number(p));
+                    } catch (e) { /* ignore */ }
+                }
             }
         },
 
