@@ -271,10 +271,14 @@ class FindResults extends Template
 
     public function getProductDetailUrl(Product $product): string
     {
-        $urlKey = (string) $product->getData('url_key');
-        return $urlKey !== ''
-            ? $this->_urlBuilder->getUrl($urlKey)
-            : $product->getProductUrl();
+        // getProductUrl() resolves the product's actual URL rewrite (e.g.
+        // "…/hampton-ceramic-coffee-mug.html"), falling back to the id-based
+        // catalog/product/view path when no rewrite exists.
+        //
+        // The previous $this->_urlBuilder->getUrl($urlKey) was wrong: it treats
+        // the url_key as a ROUTE path, producing "…/<url_key>/" (no store URL
+        // suffix, not run through url_rewrite) → a 404 on every card click.
+        return $product->getProductUrl();
     }
 
     public function formatPrice(Product $product): string
