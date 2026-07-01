@@ -113,14 +113,26 @@ class FitmentRouter implements RouterInterface
             $year = (int) $yearSeg;
         }
 
-        // Part slug is freeform — forward as-is for the Find controller
-        // to interpret against the product `parts_required` attribute.
-        $params = ['make' => $makeId];
-        if ($modelId !== null) { $params['model'] = $modelId; }
-        if ($year    !== null) { $params['year']  = $year; }
+        // Resolve the part slug against the `parts_required` multiselect options
+        // (the id-based contract FindResults filters on). Consistent with
+        // make/model: a present-but-unresolvable part slug is a miss → bail so
+        // another router can try (404), rather than silently dropping it.
+        $partId = null;
         if ($partSlug !== null && $partSlug !== '') {
-            $params['part'] = (string) $partSlug;
+            $partId = $this->resolvePartOptionId((string) $partSlug);
+            if ($partId === null) {
+                return null;
+            }
         }
+
+        // Forward using the SAME param names the rest of the module reads —
+        // make_id/model_id/year/part_id, NOT make/model/part. These drifted apart
+        // after v1.1.0 (dropdown form + FindResults were renamed to *_id, the
+        // router was not), so SEO URLs resolved but never actually filtered.
+        $params = ['make_id' => $makeId];
+        if ($modelId !== null) { $params['model_id'] = $modelId; }
+        if ($year    !== null) { $params['year']     = $year; }
+        if ($partId  !== null) { $params['part_id']  = $partId; }
 
         /** @var Http $request */
         $request->setModuleName('vehiclecompat');
@@ -156,5 +168,35 @@ class FitmentRouter implements RouterInterface
         }
         $row = $conn->fetchOne($select);
         return $row !== false ? (int) $row : null;
+    }
+
+    /**
+     * Resolve a part slug ("brake-pads") to its `parts_required` option id — the
+     * value FindResults filters on via finset. Slug-tolerant + case-insensitive,
+     * mirroring resolveByName(). Null = no such part option.
+     */
+    private function resolvePartOptionId(string $slug): ?int
+    {
+        $conn = $this->resource->getConnection();
+        $attrId = (int) $conn->fetchOne(
+            "SELECT attribute_id FROM " . $this->resource->getTableName('eav_attribute')
+            . " WHERE entity_type_id = 4 AND attribute_code = 'parts_required'"
+        );
+        if ($attrId === 0) {
+            return null;
+        }
+        $select = $conn->select()
+            ->from(['o' => $this->resource->getTableName('eav_attribute_option')], ['o.option_id'])
+            ->join(
+                ['v' => $this->resource->getTableName('eav_attribute_option_value')],
+                'v.option_id = o.option_id',
+                []
+            )
+            ->where('o.attribute_id = ?', $attrId)
+            ->where('v.store_id = ?', 0)
+            ->where("LOWER(REPLACE(v.value, ' ', '-')) = ?", strtolower($slug))
+            ->limit(1);
+        $optionId = $conn->fetchOne($select);
+        return $optionId !== false ? (int) $optionId : null;
     }
 }
