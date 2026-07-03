@@ -1,5 +1,21 @@
 # Changelog — ETechFlow_ProductFitmentFinder
 
+## [Unreleased] — Security: portal-only licensing (removes forgeable key path)
+
+- Removed the HMAC signing secret that shipped inside `LicenseValidator`
+  (`SECRET_FRAGMENTS` / `BUNDLE_SECRET_FRAGMENTS`) along with `computeKey()`
+  and `computeBundleKey()`. Anyone with the module could compute a valid key
+  for their own domain and paste it into admin — no code edit needed.
+- Licensing is now portal-only: only portal-issued `SP-` keys are honoured,
+  validated live against the eTechFlow portal. The module ships no secret.
+- Offline grace derives solely from a cached genuine portal success; it can
+  no longer be fabricated from admin-settable config.
+- Hardened `isProductionEnvironment()` to always return `true`, closing the
+  `production_environment = No` bypass, and added an explicit portal `revoked`
+  short-circuit.
+- Rewrote the unit suite as a portal-only suite including a hard test proving a
+  forged `SP-` key with attacker-controlled config and no portal is rejected.
+
 ## [1.2.1] — 2026-06-03 — Storefront copy polish + customer-facing tooltips + theme accent colour
 
 Final polish release. v1.1.1 / v1.2.0 made the big strings
