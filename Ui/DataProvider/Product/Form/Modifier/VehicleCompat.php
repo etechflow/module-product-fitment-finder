@@ -133,7 +133,7 @@ class VehicleCompat extends AbstractModifier
                 'arguments' => [
                     'data' => [
                         'config' => [
-                            'label'         => __('Vehicle Compatibility'),
+                            'label'         => __('Product Fitment Finder'),
                             'componentType' => Fieldset::NAME,
                             'collapsible'   => true,
                             'opened'        => true,
