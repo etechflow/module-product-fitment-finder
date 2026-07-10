@@ -81,12 +81,20 @@ class Config
     private const PLACEMENT_LOCATIONS = ['home', 'product', 'product_list'];
 
     public function __construct(
-        private readonly ScopeConfigInterface $scopeConfig
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly LicenseValidator $licenseValidator
     ) {
     }
 
     public function isEnabled(?int $storeId = null): bool
     {
+        // Licence gate: an unlicensed store (no valid SP- key while the
+        // Production Environment is enforced) disables the whole module — the
+        // storefront finder, garage and PDP badge all fold on this flag, so the
+        // module goes silent exactly as it does when the admin toggle is off.
+        if (!$this->licenseValidator->isValid()) {
+            return false;
+        }
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_ENABLED,
             ScopeInterface::SCOPE_STORE,
