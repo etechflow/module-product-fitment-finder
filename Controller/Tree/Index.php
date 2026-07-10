@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace ETechFlow\ProductFitmentFinder\Controller\Tree;
 
 use ETechFlow\ProductFitmentFinder\Block\PartFinderData;
+use ETechFlow\ProductFitmentFinder\Model\Config;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\ResponseInterface;
@@ -25,17 +26,27 @@ class Index implements HttpGetActionInterface
 {
     private RawFactory $rawFactory;
     private LayoutInterface $layout;
+    private Config $config;
 
     public function __construct(
         RawFactory $rawFactory,
-        LayoutInterface $layout
+        LayoutInterface $layout,
+        Config $config
     ) {
         $this->rawFactory = $rawFactory;
         $this->layout = $layout;
+        $this->config = $config;
     }
 
     public function execute(): ResponseInterface|Raw
     {
+        // Licence gate: no vehicle tree for an unlicensed store.
+        if (!$this->config->isEnabled()) {
+            $blocked = $this->rawFactory->create();
+            $blocked->setHttpResponseCode(404);
+            return $blocked;
+        }
+
         /** @var PartFinderData $block */
         $block = $this->layout->createBlock(PartFinderData::class);
         $json = $block->getTreeJson();

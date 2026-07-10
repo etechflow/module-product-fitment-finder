@@ -103,6 +103,13 @@ class PartFinderData extends Template
 
     public function getTree(): array
     {
+        // Licence gate (defence in depth): starve every consumer of finder data —
+        // the options/tree AJAX endpoints and any inline template — when the store
+        // is unlicensed, so nothing can reconstruct the finder even if a render
+        // entry point is missed.
+        if (!$this->config->isEnabled()) {
+            return ['makes' => [], 'parts' => []];
+        }
         if ($this->tree !== null) {
             return $this->tree;
         }

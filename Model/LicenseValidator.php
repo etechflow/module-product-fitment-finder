@@ -253,6 +253,67 @@ class LicenseValidator
         return true;
     }
 
+    /**
+     * Read-only licence state for the admin gate notice — one of
+     * active | suspended | expired | blocked | invalid | none.
+     *
+     * Guide §3g Rule 1: this NEVER mutates or clears the key. It only asks the
+     * portal's /license/status endpoint why access is denied, so the merchant
+     * can be shown a precise reason ("suspended" vs "IP blocked" vs "expired")
+     * instead of a blank page. Cached 60s to avoid a portal round-trip on every
+     * admin request. Falls back to 'invalid' (unknown reason) when the portal is
+     * unreachable, and 'none' when there is simply no SP- key configured yet.
+     */
+    public function getLicenseState(): string
+    {
+        $host = $this->getCurrentHost();
+        $key  = $this->getConfiguredKey();
+        if (!str_starts_with($key, 'SP-')) {
+            $key = $this->getConfiguredBundleKey();
+        }
+        if ($host === '' || !str_starts_with($key, 'SP-')) {
+            return 'none';
+        }
+
+        $cacheKey = 'etf_pff_lic_state_' . md5($this->canonicalize($host) . ':' . $key);
+        $cached   = $this->cache->load($cacheKey);
+        if ($cached !== false && $cached !== null && $cached !== '') {
+            return (string) $cached;
+        }
+
+        $apiBase = $this->getPortalApiBase();
+        if ($apiBase === '') {
+            return 'invalid';
+        }
+
+        $url = rtrim($apiBase, '/') . '/license/status'
+            . '?platform=magento'
+            . '&module='      . urlencode(self::MODULE_ID)
+            . '&domain='      . urlencode($this->canonicalize($host))
+            . '&license_key=' . urlencode($key);
+
+        $state = 'invalid';
+        try {
+            $this->curl->setTimeout(8);
+            $this->curl->addHeader('Accept', 'application/json');
+            $this->curl->addHeader('User-Agent', 'ETechFlow-PFF/1.0');
+            $this->curl->get($url);
+            if ((int) $this->curl->getStatus() === 200) {
+                $data = json_decode((string) $this->curl->getBody(), true);
+                if (is_array($data)) {
+                    $state = !empty($data['ip_blocked']) ? 'blocked'
+                        : (!empty($data['state']) ? (string) $data['state']
+                        : (isset($data['valid']) ? ($data['valid'] ? 'active' : 'invalid') : 'invalid'));
+                }
+            }
+        } catch (\Throwable) {
+            // portal unreachable → leave as 'invalid' (unknown), never mutate the key
+        }
+
+        $this->cache->save($state, $cacheKey, [self::CACHE_TAG], 60);
+        return $state;
+    }
+
     public function getCurrentHost(): string
     {
         try {

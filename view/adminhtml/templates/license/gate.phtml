@@ -1,0 +1,46 @@
+<?php
+/** @var \ETechFlow\ProductFitmentFinder\Block\Adminhtml\License\Gate $block */
+
+$state     = $block->getLicenseState();
+$configUrl = $block->getConfigUrl();
+
+// Guide §3g Rule 2: precise, state-aware reason so the merchant knows WHY they
+// are blocked. The key is never touched here — this is display only.
+$notices = [
+    'suspended' => [
+        'Module access suspended',
+        'Your licence for this domain has been suspended by the administrator. Please contact support@etechflow.com to restore access.',
+    ],
+    'expired' => [
+        'Subscription ended',
+        'Your subscription for this domain has ended. Please renew, or contact support@etechflow.com to restore access.',
+    ],
+    'blocked' => [
+        'Module access blocked',
+        'Access to this module has been blocked for this server (its IP is not authorised). Please contact support@etechflow.com to restore access.',
+    ],
+];
+
+if (isset($notices[$state])) {
+    [$title, $msg] = $notices[$state];
+} else {
+    // 'none' (no key yet) or 'invalid' (unknown / wrong domain / unreachable portal)
+    $title = 'Licence required';
+    $msg   = 'Product Fitment Finder is not licensed for this domain yet. Purchase a licence at '
+           . 'module.etechflow.com, then paste your SP- key into the module configuration to activate it.';
+}
+?>
+<div style="max-width:640px;margin:64px auto;padding:36px;border:1px solid #7f1d1d;border-radius:14px;background:#1b0d0d;color:#f3d6d6;text-align:center;font-family:-apple-system,'Segoe UI',sans-serif;">
+    <div style="font-size:46px;line-height:1;">&#9888;</div>
+    <h2 style="color:#fff;margin:14px 0 8px;font-size:22px;"><?= $block->escapeHtml($title) ?></h2>
+    <p style="font-size:15px;line-height:1.6;max-width:520px;margin:0 auto;"><?= $block->escapeHtml($msg) ?></p>
+    <p style="margin-top:22px;">
+        <a href="<?= $block->escapeUrl($configUrl) ?>"
+           style="display:inline-block;padding:11px 22px;background:#fff;color:#1b0d0d;border-radius:8px;text-decoration:none;font-weight:600;">
+            Enter licence key
+        </a>
+    </p>
+    <p style="margin-top:18px;font-size:14px;">
+        Contact <a href="mailto:support@etechflow.com" style="color:#ff8a8a;">support@etechflow.com</a> to restore access.
+    </p>
+</div>

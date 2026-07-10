@@ -198,6 +198,13 @@ class PartFinder extends Template implements BlockInterface
      */
     protected function _toHtml()
     {
+        // Licence gate: an unlicensed store renders no Part Finder form anywhere —
+        // Find-page sidebar, {{widget}}, CMS block or an auto-placement. isEnabled()
+        // folds in LicenseValidator::isValid(), so this is the same silence the
+        // module shows when the admin master toggle is off.
+        if (!$this->config->isEnabled()) {
+            return '';
+        }
         $location = (string) $this->getData('vc_location');
         if ($location !== '' && !$this->config->isPartFinderEnabledFor($location)) {
             return '';

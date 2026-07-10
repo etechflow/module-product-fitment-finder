@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+    Guide §3g Rule 2: gate the module's own admin route. The route-level
+    predispatch event fires for every etechflow_vehicle/* admin action (Manage
+    Makes, Manage Models, CSV import), so a single observer freezes all of them
+    when the licence is not valid. It deliberately does NOT touch the
+    adminhtml/system_config route, so Stores -> Configuration stays reachable and
+    the merchant can always paste a new key.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="controller_action_predispatch_etechflow_vehicle">
+        <observer name="etechflow_pff_admin_gate"
+                  instance="ETechFlow\ProductFitmentFinder\Observer\AdminGate"/>
+    </event>
+</config>

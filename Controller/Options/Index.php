@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ETechFlow\ProductFitmentFinder\Controller\Options;
 
 use ETechFlow\ProductFitmentFinder\Block\PartFinderData;
+use ETechFlow\ProductFitmentFinder\Model\Config;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
@@ -34,19 +35,29 @@ class Index implements HttpGetActionInterface
     private RawFactory $rawFactory;
     private LayoutInterface $layout;
     private RequestInterface $request;
+    private Config $config;
 
     public function __construct(
         RawFactory $rawFactory,
         LayoutInterface $layout,
-        RequestInterface $request
+        RequestInterface $request,
+        Config $config
     ) {
         $this->rawFactory = $rawFactory;
         $this->layout = $layout;
         $this->request = $request;
+        $this->config = $config;
     }
 
     public function execute(): ResponseInterface|Raw
     {
+        // Licence gate: no dropdown data for an unlicensed store.
+        if (!$this->config->isEnabled()) {
+            $blocked = $this->rawFactory->create();
+            $blocked->setHttpResponseCode(404);
+            return $blocked;
+        }
+
         $field = (string) $this->request->getParam('field', '');
         $selMake  = (int) $this->request->getParam('make_id', 0);
         $selModel = (int) $this->request->getParam('model_id', 0);

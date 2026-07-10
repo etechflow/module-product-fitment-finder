@@ -6,6 +6,16 @@
             <license>
                 <license_key></license_key>
                 <production_environment>1</production_environment>
+                <!--
+                    CRITICAL (guide §3b): base URL of the live licensing service.
+                    LicenseValidator appends "/license/validate" and "/license/status"
+                    itself, so this is the BASE only (no path). Without this default a
+                    fresh install has no portal to call, validateViaPortal() returns
+                    null, and even a valid SP- key can never be confirmed — the module
+                    stays blocked. Baking it in means no manual config:set after install.
+                -->
+                <portal_url>https://license-service.etechflow.com</portal_url>
+                <portal_api_url>https://license-service.etechflow.com</portal_api_url>
             </license>
             <general>
                 <enabled>1</enabled>

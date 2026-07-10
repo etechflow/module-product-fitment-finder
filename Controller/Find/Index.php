@@ -7,6 +7,7 @@ use ETechFlow\ProductFitmentFinder\Model\Config;
 use ETechFlow\ProductFitmentFinder\Model\SeoUrlBuilder;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\ForwardFactory;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\View\Result\PageFactory;
@@ -29,12 +30,19 @@ class Index implements HttpGetActionInterface
         private readonly RedirectFactory $redirectFactory,
         private readonly SeoUrlBuilder $seoUrlBuilder,
         private readonly StoreManagerInterface $storeManager,
-        private readonly Config $config
+        private readonly Config $config,
+        private readonly ForwardFactory $forwardFactory
     ) {
     }
 
     public function execute(): ResultInterface
     {
+        // Licence gate: an unlicensed / wrong-domain store must not serve the Find
+        // Your Parts results page at all — 404 it exactly like a disabled module.
+        if (!$this->config->isEnabled()) {
+            return $this->forwardFactory->create()->forward('noroute');
+        }
+
         // Only canonicalise requests that arrived on the plain /vehiclecompat/find
         // route. When FitmentRouter forwards a pretty /<prefix>/… URL here, the
         // path still starts with the SEO prefix — skip it, or we'd loop.
